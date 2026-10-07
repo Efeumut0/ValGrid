@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <item>
-	<version>1.3.13</version>
-	<url>https://github.com/Efeumut0/ValGrid/releases/latest/download/ValGrid_Setup_v1.3.13.exe</url>
+	<version>1.3.14</version>
+	<url>https://github.com/Efeumut0/ValGrid/releases/latest/download/ValGrid_Setup_v1.3.14.exe</url>
 	<changelog>https://github.com/Efeumut0/ValGrid/releases/latest</changelog>
 	<mandatory>false</mandatory>
 </item>

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Efeumut0/ValGrid/releases/latest"><img src="https://img.shields.io/badge/release-v1.3.13-38bdf8.svg?style=flat-square&logo=github" alt="Release" /></a>
+  <a href="https://github.com/Efeumut0/ValGrid/releases/latest"><img src="https://img.shields.io/badge/release-v1.3.14-38bdf8.svg?style=flat-square&logo=github" alt="Release" /></a>
   <img src="https://img.shields.io/badge/platform-Windows_10_|_11-0078d6.svg?style=flat-square&logo=windows" alt="Platform" />
   <img src="https://img.shields.io/badge/.NET-6.0--windows-512bd4.svg?style=flat-square&logo=dotnet" alt=".NET 6.0" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg?style=flat-square" alt="License" /></a>
@@ -20,8 +20,9 @@
   <a href="#-overview">Overview</a> •
   <a href="#-key-features">Features</a> •
   <a href="#-download--installation">Download</a> •
+  <a href="#-automatic-updates">Updates</a> •
   <a href="#-chat-message-templates">Chat Templates</a> •
-  <a href="#-building-from-source">Build</a> •
+  <a href="#-privacy--safety">Privacy</a> •
   <a href="#-disclaimer">Disclaimer</a> •
   <a href="#-türkçe-açıklama">🇹🇷 Türkçe</a>
 </p>
@@ -31,6 +32,8 @@
 ## 📖 Overview
 
 **ValGrid** is a fast, clean, and modern open-source Windows desktop assistant for Valorant players. By interfacing locally with the official Riot Client local API and Valorant public services, it provides real-time lobby rank inspection, teammate/opponent inventory value calculation, store rotation and Night Market browsing with HD skin preview videos, custom player notes, and customizable one-click chat announcements.
+
+Everything is packed into a single, lightweight Windows installer that includes both the main application and an optional silent background watcher.
 
 ---
 
@@ -69,11 +72,19 @@
 
 ## 📥 Download & Installation
 
-1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) (`ValGrid_Setup_v1.3.13.exe`).
-2. Run the setup wizard (installing the background watcher is optional).
+1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) (`ValGrid_Setup_v1.3.14.exe`).
+2. Run the setup wizard (installing the silent background watcher is optional during setup).
 3. Start Valorant and launch ValGrid — lobby data will populate automatically.
 
-> **System Requirements:** Windows 10 (version 1903+) or Windows 11 (64-bit). The installer will automatically configure the required .NET 6 Desktop Runtime if needed.
+> **System Requirements:** Windows 10 (version 1903+) or Windows 11 (64-bit). The installer automatically configures the required .NET 6 Desktop Runtime if needed.
+
+---
+
+## 🔄 Automatic Updates
+
+ValGrid includes built-in update detection connected directly to GitHub Releases:
+- Whenever a new version is published on GitHub, ValGrid detects it upon launch or via **Settings > Güncellemeleri Denetle / Check for Updates**.
+- The app notifies you with release details and downloads the updated installer package automatically.
 
 ---
 
@@ -86,37 +97,11 @@ ValGrid includes customizable clipboard message templates for team chat:
 | `{totalVp}` | Total lobby equipped skins value in VP | `48,500` |
 | `{totalTl}` | Estimated currency value | `~5.820 TL` |
 | `{richest}` | Summary of highest inventory players | `Our Jett (12500 VP), Enemy Reyna (8700 VP)` |
-| `{richest1}` | Highest inventory player | `Jett (12500 VP)` |
+| `{richest1}` | #1 richest player in the match | `Jett (12500 VP)` |
 | `{blacklist}` | Blacklisted/toxic players in the lobby | `Player1, Player2` |
 | `{leaderboard}` | Single-line top inventory leaderboard | `1. Jett (12500), 2. Reyna (8700)...` |
 
 Templates can be personalized under **Settings > Chat Templates** with real-time test preview.
-
----
-
-## 🛠️ Building from Source
-
-### Prerequisites
-- [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
-- Windows 10/11 x64
-- [Inno Setup 6](https://jrsoftware.org/isinfo.php) *(required only for building the installer)*
-
-### Build Commands
-
-```powershell
-# Clone the repository
-git clone https://github.com/Efeumut0/ValGrid.git
-cd ValGrid
-
-# Compile the solution in Release mode
-dotnet build ValGrid.sln -c Release
-
-# Run ValGrid
-.\START_VALGRID.bat
-
-# Build standalone setup installer (.exe)
-powershell -ExecutionPolicy Bypass -File .\Build-Installer.ps1
-```
 
 ---
 
@@ -148,6 +133,8 @@ This project is licensed under the [MIT License](LICENSE).
 
 **ValGrid**, Valorant oyuncuları için geliştirilmiş; canlı maç istihbaratı, lobi envanter değeri hesaplayıcı, video önizlemeli günlük mağaza vitrini, oyuncu hafızası ve özelleştirilebilir sohbet şablonlarını tek çatı altında toplayan modern bir Windows masaüstü asistanıdır.
 
+Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.exe`) halinde sunulur.
+
 ---
 
 ### 🚀 Öne Çıkan Özellikler
@@ -172,27 +159,21 @@ This project is licensed under the [MIT License](LICENSE).
    - Ayarlar menüsünden `{totalVp}`, `{totalTl}`, `{richest}`, `{blacklist}`, `{leaderboard}` gibi dinamik etiketlerle mesajlarınızı canlı önizlemeli olarak dilediğiniz gibi düzenleyebilirsiniz.
 
 6. **Sessiz Arka Plan Algılayıcısı (ValGridWatcher):**
-   - Bilgisayarınızda Valorant başlatıldığında ValGrid'i otomatik olarak açan hafif arka plan servisi. Ayarlardan istendiğinde açılıp kapatılabilir.
+   - Bilgisayarınızda Valorant başlatıldığında ValGrid'i otomatik olarak açan hafif arka plan servisi. Ayarlardan istendiğinde açılıp kapatılabilir. Kurulum sihirbazında seçilebilir.
 
 ---
 
-### 💾 Kurulum & Kullanım
+### 💾 Kurulum & Otomatik Güncelleme
 
-1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) bölümünden en güncel `ValGrid_Setup_v1.3.13.exe` dosyasını indirin.
-2. Kurulum sihirbazını tamamlayın.
+1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) sayfasından en güncel `ValGrid_Setup_v1.3.14.exe` kurulum dosyasını indirin.
+2. Kurulum sihirbazını tamamlayın (arka plan izleyicisini kurmak isteğe bağlıdır).
 3. Valorant çalışırken ValGrid'i açın; lobi verileri otomatik olarak ekrana gelecektir.
+4. **Otomatik Güncelleme:** GitHub üzerinde yeni bir release yayınlandığında, ValGrid açılışta veya Ayarlar menüsünden güncellemeyi otomatik olarak algılar ve yeni kurulum paketini indirmenizi sağlar.
 
 ---
 
-### 💻 Kaynak Koddan Derleme
+### 🔒 Güvenlik & Gizlilik
 
-```powershell
-# Projeyi derle
-dotnet build ValGrid.sln -c Release
-
-# Uygulamayı başlat
-.\START_VALGRID.bat
-
-# Kurulum paketini (.exe) oluştur
-powershell -ExecutionPolicy Bypass -File .\Build-Installer.ps1
-```
+* **Hesap Şifresi İstemez:** Yalnızca bilgisayarınızda çalışan yerel Riot Client lockfile oturumu üzerinden güvenle veri okur.
+* **Tamamen Yerel:** Oyuncu notları ve geçmiş karşılaşmalar `%LocalAppData%\ValGrid` altında yerel olarak tutulur.
+* **Riot Kurallarına Uygun:** Oyuna DLL enjekte etmez veya oyun dosyalarını değiştirmez.

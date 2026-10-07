@@ -1,5 +1,5 @@
 ﻿#define MyAppName "ValGrid"
-#define MyAppVersion "1.3.13"
+#define MyAppVersion "1.3.14"
 #define MyAppPublisher "ValGrid Team"
 #define MyAppURL "https://github.com/Efeumut0/ValGrid"
 #define MyAppExeName "ValGrid.exe"
@@ -35,15 +35,15 @@ Name: "tr"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-tr.CreateDesktopIcon=MasaÃƒÂ¼stÃƒÂ¼ kÃ„Â±sayolu oluÃ…Å¸tur
-tr.CreateStartMenuIcon=BaÃ…Å¸lat menÃƒÂ¼sÃƒÂ¼ kÃ„Â±sayolu oluÃ…Å¸tur
-tr.AutoStartWithWindows=Windows aÃƒÂ§Ã„Â±lÃ„Â±Ã…Å¸Ã„Â±nda ValGrid'i baÃ…Å¸lat
-tr.InstallWatcher=Valorant aÃƒÂ§Ã„Â±ldÃ„Â±Ã„Å¸Ã„Â±nda ValGrid'i otomatik baÃ…Å¸lat (Arka plan servisi)
-tr.DotNet6Missing=ValGrid uygulamasÃ„Â±nÃ„Â±n ÃƒÂ§alÃ„Â±Ã…Å¸abilmesi iÃƒÂ§in Microsoft .NET 6 Desktop Runtime gereklidir. Otomatik indirilip kurulsun mu?
-tr.DotNet6Downloading=.NET 6 Desktop Runtime indiriliyor, lÃƒÂ¼tfen bekleyin...
+tr.CreateDesktopIcon=MasaÃƒÆ’Ã‚Â¼stÃƒÆ’Ã‚Â¼ kÃƒâ€Ã‚Â±sayolu oluÃƒâ€¦Ã…Â¸tur
+tr.CreateStartMenuIcon=BaÃƒâ€¦Ã…Â¸lat menÃƒÆ’Ã‚Â¼sÃƒÆ’Ã‚Â¼ kÃƒâ€Ã‚Â±sayolu oluÃƒâ€¦Ã…Â¸tur
+tr.AutoStartWithWindows=Windows aÃƒÆ’Ã‚Â§Ãƒâ€Ã‚Â±lÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸Ãƒâ€Ã‚Â±nda ValGrid'i baÃƒâ€¦Ã…Â¸lat
+tr.InstallWatcher=Valorant aÃƒÆ’Ã‚Â§Ãƒâ€Ã‚Â±ldÃƒâ€Ã‚Â±Ãƒâ€Ã…Â¸Ãƒâ€Ã‚Â±nda ValGrid'i otomatik baÃƒâ€¦Ã…Â¸lat (Arka plan servisi)
+tr.DotNet6Missing=ValGrid uygulamasÃƒâ€Ã‚Â±nÃƒâ€Ã‚Â±n ÃƒÆ’Ã‚Â§alÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸abilmesi iÃƒÆ’Ã‚Â§in Microsoft .NET 6 Desktop Runtime gereklidir. Otomatik indirilip kurulsun mu?
+tr.DotNet6Downloading=.NET 6 Desktop Runtime indiriliyor, lÃƒÆ’Ã‚Â¼tfen bekleyin...
 tr.DotNet6Installing=.NET 6 Desktop Runtime kuruluyor...
-tr.DotNet6Failed=ValGrid iÃƒÂ§in .NET 6 Desktop Runtime indirilemedi veya kurulamadÃ„Â±. LÃƒÂ¼tfen Microsoft sitesinden .NET 6 Desktop Runtime paketini kurun.
-tr.UninstallCleanData=ValGrid maÃƒÂ§ geÃƒÂ§miÃ…Å¸i, kariyer verileri ve ÃƒÂ¶zel notlarÃ„Â±nÃ„Â±z da silinsin mi?
+tr.DotNet6Failed=ValGrid iÃƒÆ’Ã‚Â§in .NET 6 Desktop Runtime indirilemedi veya kurulamadÃƒâ€Ã‚Â±. LÃƒÆ’Ã‚Â¼tfen Microsoft sitesinden .NET 6 Desktop Runtime paketini kurun.
+tr.UninstallCleanData=ValGrid maÃƒÆ’Ã‚Â§ geÃƒÆ’Ã‚Â§miÃƒâ€¦Ã…Â¸i, kariyer verileri ve ÃƒÆ’Ã‚Â¶zel notlarÃƒâ€Ã‚Â±nÃƒâ€Ã‚Â±z da silinsin mi?
 
 en.CreateDesktopIcon=Create desktop shortcut
 en.CreateStartMenuIcon=Create Start Menu shortcut
@@ -191,6 +191,7 @@ begin
     end;
   end;
 end;
+
 
 
 

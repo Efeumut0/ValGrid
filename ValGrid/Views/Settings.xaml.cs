@@ -223,7 +223,7 @@ public partial class Settings : UserControl
                 try
                 {
                     AutoUpdater.InstalledVersion = new Version(productVersion);
-                    AutoUpdater.Start("https://raw.githubusercontent.com/ValGrid/ValGrid/main/ValGrid/VersionInfo.xml");
+                    AutoUpdater.Start("https://raw.githubusercontent.com/Efeumut0/ValGrid/main/ValGrid/VersionInfo.xml");
                 }
                 catch { }
             });
@@ -245,7 +245,7 @@ public partial class Settings : UserControl
         try
         {
             using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(4) };
-            var content = await client.GetStringAsync("https://raw.githubusercontent.com/ValGrid/ValGrid/main/ValGrid/VersionInfo.xml").ConfigureAwait(false);
+            var content = await client.GetStringAsync("https://raw.githubusercontent.com/Efeumut0/ValGrid/main/ValGrid/VersionInfo.xml").ConfigureAwait(false);
             var xml = new XmlDocument();
             xml.LoadXml(content);
             var result = xml.GetElementsByTagName("version");
