@@ -179,7 +179,7 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.15";
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.18";
 
         var valGridAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\ValGrid";
         var legacyAppDataNowt = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\NOWT";
@@ -198,6 +198,12 @@ public partial class App : Application
             )
             .CreateLogger();
         Constants.Log.Information("ValGrid Application Start. Version: {Version}", version);
+
+        try
+        {
+            WatcherHelper.CleanLegacyWatchers();
+        }
+        catch { }
 
         CheckAndUpdateJsonAsync().ConfigureAwait(false);
 

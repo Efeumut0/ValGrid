@@ -11,6 +11,11 @@ public static class WatcherHelper
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "ValGridWatcher";
     private const string ShutdownEventName = @"Global\ValGrid_Watcher_Shutdown_Event";
+    private static readonly string FlagFilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "ValGrid",
+        "watcher_enabled.flag"
+    );
 
     public static string? FindWatcherExe()
     {
@@ -43,8 +48,7 @@ public static class WatcherHelper
 
     public static bool IsWatcherRunning()
     {
-        return Process.GetProcessesByName("ValGridWatcher").Length > 0
-            || Process.GetProcessesByName("ValorantWatcher").Length > 0;
+        return Process.GetProcessesByName("ValGridWatcher").Length > 0;
     }
 
     public static bool IsWatcherAutoStartEnabled()
@@ -62,13 +66,42 @@ public static class WatcherHelper
 
     public static bool IsWatcherEnabled()
     {
-        return IsWatcherAutoStartEnabled() || IsWatcherRunning();
+        try
+        {
+            // 1. Check flag file if exists
+            if (File.Exists(FlagFilePath))
+            {
+                var content = File.ReadAllText(FlagFilePath).Trim();
+                if (content == "1") return true;
+                if (content == "0") return false;
+            }
+
+            // 2. Fallback to registry check
+            return IsWatcherAutoStartEnabled();
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static bool SetWatcherEnabled(bool enable)
     {
         try
         {
+            // Clean up any old legacy names
+            CleanLegacyWatchers();
+
+            // Save state to persistent flag file
+            try
+            {
+                var dir = Path.GetDirectoryName(FlagFilePath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                File.WriteAllText(FlagFilePath, enable ? "1" : "0");
+            }
+            catch { }
+
             if (enable)
             {
                 var watcherExe = FindWatcherExe();
@@ -112,10 +145,6 @@ public static class WatcherHelper
                 {
                     try { p.Kill(); } catch { }
                 }
-                foreach (var p in Process.GetProcessesByName("ValorantWatcher"))
-                {
-                    try { p.Kill(); } catch { }
-                }
 
                 return true;
             }
@@ -126,5 +155,32 @@ public static class WatcherHelper
             return false;
         }
     }
-}
 
+    public static void CleanLegacyWatchers()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, true);
+            if (key != null)
+            {
+                key.DeleteValue("ValPulseWatcher", false);
+                key.DeleteValue("NOWT-ValorantWatcher", false);
+                key.DeleteValue("ValorantWatcher", false);
+            }
+        }
+        catch { }
+
+        try
+        {
+            foreach (var p in Process.GetProcessesByName("ValPulseWatcher"))
+            {
+                try { p.Kill(); } catch { }
+            }
+            foreach (var p in Process.GetProcessesByName("ValorantWatcher"))
+            {
+                try { p.Kill(); } catch { }
+            }
+        }
+        catch { }
+    }
+}

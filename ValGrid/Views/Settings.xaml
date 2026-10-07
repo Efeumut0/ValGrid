@@ -378,22 +378,22 @@
 				<Button Grid.Row="4" x:Name="WatcherToggleButton"
 				        Click="ToggleWatcher_Click"
 				        Cursor="Hand" Height="30" Width="175" HorizontalAlignment="Center"
-				        Background="#182338" BorderBrush="#007EF9" BorderThickness="1.2">
+				        Background="#241920" BorderBrush="#64748b" BorderThickness="1.2">
 					<Button.Resources>
 						<Style TargetType="Border">
 							<Setter Property="CornerRadius" Value="8" />
 						</Style>
 					</Button.Resources>
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-						<fa:ImageAwesome x:Name="WatcherToggleIcon" Icon="Solid_Check" PrimaryColor="#32e2b2" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
-						<TextBlock x:Name="WatcherToggleText" Text="İzleyici Açık"
-						           FontFamily="{StaticResource Nunito}" FontSize="11.5" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+						<fa:ImageAwesome x:Name="WatcherToggleIcon" Icon="Solid_Xmark" PrimaryColor="#94a3b8" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+						<TextBlock x:Name="WatcherToggleText" Text="İzleyici Kapalı"
+						           FontFamily="{StaticResource Nunito}" FontSize="11.5" FontWeight="Bold" Foreground="#94a3b8" VerticalAlignment="Center" />
 					</StackPanel>
 				</Button>
 
 				<!-- Durum Metni -->
 				<TextBlock Grid.Row="5" x:Name="WatcherStatusText"
-				           Text="Arka planda Valorant bekleniyor"
+				           Text="İzleyici devre dışı"
 				           FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold"
 				           Foreground="#64748b" HorizontalAlignment="Center" Margin="0,4,0,0" />
 			</Grid>
