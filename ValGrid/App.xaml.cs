@@ -179,7 +179,7 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.14";
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.15";
 
         var valGridAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\ValGrid";
         var legacyAppDataNowt = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\NOWT";

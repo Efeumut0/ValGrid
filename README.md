@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Efeumut0/ValGrid/releases/latest"><img src="https://img.shields.io/badge/release-v1.3.14-38bdf8.svg?style=flat-square&logo=github" alt="Release" /></a>
+  <a href="https://github.com/Efeumut0/ValGrid/releases/latest"><img src="https://img.shields.io/badge/release-v1.3.15-38bdf8.svg?style=flat-square&logo=github" alt="Release" /></a>
   <img src="https://img.shields.io/badge/platform-Windows_10_|_11-0078d6.svg?style=flat-square&logo=windows" alt="Platform" />
   <img src="https://img.shields.io/badge/.NET-6.0--windows-512bd4.svg?style=flat-square&logo=dotnet" alt=".NET 6.0" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg?style=flat-square" alt="License" /></a>
@@ -72,7 +72,7 @@ Everything is packed into a single, lightweight Windows installer that includes 
 
 ## 📥 Download & Installation
 
-1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) (`ValGrid_Setup_v1.3.14.exe`).
+1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) (`ValGrid_Setup_v1.3.15.exe`).
 2. Run the setup wizard (installing the silent background watcher is optional during setup).
 3. Start Valorant and launch ValGrid — lobby data will populate automatically.
 
@@ -165,7 +165,7 @@ Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.
 
 ### 💾 Kurulum & Otomatik Güncelleme
 
-1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) sayfasından en güncel `ValGrid_Setup_v1.3.14.exe` kurulum dosyasını indirin.
+1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) sayfasından en güncel `ValGrid_Setup_v1.3.15.exe` kurulum dosyasını indirin.
 2. Kurulum sihirbazını tamamlayın (arka plan izleyicisini kurmak isteğe bağlıdır).
 3. Valorant çalışırken ValGrid'i açın; lobi verileri otomatik olarak ekrana gelecektir.
 4. **Otomatik Güncelleme:** GitHub üzerinde yeni bir release yayınlandığında, ValGrid açılışta veya Ayarlar menüsünden güncellemeyi otomatik olarak algılar ve yeni kurulum paketini indirmenizi sağlar.
@@ -177,3 +177,12 @@ Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.
 * **Hesap Şifresi İstemez:** Yalnızca bilgisayarınızda çalışan yerel Riot Client lockfile oturumu üzerinden güvenle veri okur.
 * **Tamamen Yerel:** Oyuncu notları ve geçmiş karşılaşmalar `%LocalAppData%\ValGrid` altında yerel olarak tutulur.
 * **Riot Kurallarına Uygun:** Oyuna DLL enjekte etmez veya oyun dosyalarını değiştirmez.
+
+---
+
+### 🌟 Orijinal Proje & Teşekkürler (Credits & Attribution)
+
+Bu proje, Soneliem tarafından geliştirilen açık kaynaklı **[NOWT](https://github.com/Soneliem/NOWT)** projesinin temelleri üzerine inşa edilmiş, yeniden adlandırılmış, modernize edilmiş ve yeni özelliklerle (chat şablon sistemi, çift dilli arayüz, arka plan izleyicisi, envanter hesaplayıcı) geliştirilmiştir. Katkılarından ötürü orijinal geliştiricilere teşekkür ederiz.
+
+* **Orijinal Proje:** [https://github.com/Soneliem/NOWT](https://github.com/Soneliem/NOWT)
+* **Lisans:** [MIT License](LICENSE)
