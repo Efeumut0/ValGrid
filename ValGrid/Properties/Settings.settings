@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ValGrid.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Language" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Weapon1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Sheriff</Value>
+    </Setting>
+    <Setting Name="Weapon2" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Spectre</Value>
+    </Setting>
+    <Setting Name="Weapon3" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Vandal</Value>
+    </Setting>
+    <Setting Name="Weapon4" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Phantom</Value>
+    </Setting>
+    <Setting Name="ChatCopyTemplate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Bu maçın toplam envanter değeri (SADECE TAKILI OLANLAR) {vp}vp ve {tl}, En zenginse {richest_vp} ile {takım} {ajan} idi, İyi günler diler ve Ez Yazanların anasını sikiyim ♥</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

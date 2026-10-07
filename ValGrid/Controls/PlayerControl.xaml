@@ -1,0 +1,856 @@
+<UserControl
+	x:Class="ValGrid.Controls.PlayerControl"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:p="clr-namespace:ValGrid.Properties"
+	xmlns:converters="clr-namespace:ValGrid.Converters"
+	xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+	x:Name="Self"
+	d:DesignHeight="450"
+	d:DesignWidth="2000"
+	mc:Ignorable="d" d:DataContext="{d:DesignData PlayerControl}">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+		<Style x:Key="LinkButtonStyle" TargetType="Button">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<TextBlock
+							FontFamily="{StaticResource Nunito}"
+							Cursor="Hand"
+							Foreground="DodgerBlue"
+							Text="{TemplateBinding Content}"
+							TextDecorations="Underline" />
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style TargetType="ToolTip">
+			<Setter Property="Background" Value="#32e2b2" />
+			<Setter Property="FontWeight" Value="SemiBold" />
+			<Setter Property="Foreground" Value="Black" />
+			<Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+			<Setter Property="HasDropShadow" Value="False" />
+		</Style>
+		<Storyboard x:Key="expandStoryboard">
+			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+			                 To="1.02" Duration="0:0:0.1" />
+			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+			                 To="1.02" Duration="0:0:0.1" />
+		</Storyboard>
+		<Storyboard x:Key="shrinkStoryboard">
+			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+			                 To="1" Duration="0:0:0.1" />
+			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+			                 To="1" Duration="0:0:0.1" />
+		</Storyboard>
+	</UserControl.Resources>
+
+	<Border
+		Visibility="{Binding PlayerCell.Active, ElementName=Self}"
+		Background="{Binding PlayerCell.CardBackground, ElementName=Self}"
+		BorderBrush="{Binding PlayerCell.CardBorderBrush, ElementName=Self}"
+		BorderThickness="{Binding PlayerCell.CardBorderThickness, ElementName=Self}"
+		RenderTransformOrigin="0.5,0.5"
+		CornerRadius="20">
+		<Border.Effect>
+			<DropShadowEffect BlurRadius="{Binding PlayerCell.CardShadowBlur, ElementName=Self}"
+			                  ShadowDepth="{Binding PlayerCell.CardShadowDepth, ElementName=Self}"
+			                  Color="{Binding PlayerCell.CardShadowColor, ElementName=Self}"
+			                  Opacity="{Binding PlayerCell.CardShadowOpacity, ElementName=Self}" />
+		</Border.Effect>
+		<Grid>
+			<!-- Party Left Accent Bar -->
+			<Border Width="4" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+			        Background="{Binding PlayerCell.PlayerUiData.PartyColour, ElementName=Self}"
+			        CornerRadius="20 0 0 20"
+			        Visibility="{Binding PlayerCell.PlayerUiData.PartyBorderVisibility, ElementName=Self}" />
+
+			<Grid Margin="12,6">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition SharedSizeGroup="A" />
+				<RowDefinition SharedSizeGroup="A" />
+				<RowDefinition SharedSizeGroup="A" />
+			</Grid.RowDefinitions>
+
+			<Grid
+				Grid.RowSpan="3"
+				Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
+				Margin="0,0,10,0">
+				<!-- Base container: ensures dark background & subtle border even if image is null/loading -->
+				<Border CornerRadius="10" Background="#1c2136" BorderBrush="#2e3752" BorderThickness="1.5">
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+					<Grid>
+						<!-- Default user icon fallback if image is missing -->
+						<fa:ImageAwesome Icon="Solid_User" PrimaryColor="#3d496b" Width="26" Height="26"
+						                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+						<Border CornerRadius="9">
+							<Border.Background>
+								<ImageBrush RenderOptions.BitmapScalingMode="HighQuality" Stretch="UniformToFill"
+								            ImageSource="{Binding PlayerCell.IdentityData.Image, ElementName=Self}" />
+							</Border.Background>
+						</Border>
+					</Grid>
+				</Border>
+			</Grid>
+
+			<!-- Ajan adi + kullanici adi ayni satirda (yan yana) -> alt satir silaha kaldi -->
+			<Viewbox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Margin="0,0,75,0">
+				<StackPanel Orientation="Horizontal" MouseRightButtonUp="PlayerName_RightClick" Cursor="Hand"
+				            ToolTip="Sol Tık: Tracker Profilini Aç | Sağ Tık: İsmi Kopyala" ToolTipService.InitialShowDelay="0">
+					<TextBlock
+						Background="Transparent"
+						FontFamily="{StaticResource Nunito}"
+						FontWeight="Bold"
+						Foreground="#32e2b2"
+						VerticalAlignment="Center"
+						Margin="0,0,14,0"
+						Text="{Binding PlayerCell.IdentityData.Name, ElementName=Self}" />
+					<TextBox
+						Background="Transparent"
+						FontFamily="{StaticResource Nunito}"
+						BorderThickness="0"
+						FontWeight="Normal"
+						Foreground="#9f97b0"
+						VerticalAlignment="Center"
+						IsReadOnly="True"
+						ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
+						ToolTipService.InitialShowDelay="0"
+						Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}"
+						Visibility="{Binding PlayerCell.IgnData.TrackerDisabled, ElementName=Self}" />
+					<TextBlock
+						FontWeight="Normal"
+						Foreground="#9f97b0"
+						VerticalAlignment="Center"
+						ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
+						ToolTipService.InitialShowDelay="0"
+						Visibility="{Binding PlayerCell.IgnData.TrackerEnabled, ElementName=Self}">
+						<Hyperlink
+							NavigateUri="{Binding PlayerCell.IgnData.TrackerUri, ElementName=Self}"
+							RequestNavigate="HandleLinkClick"
+							MouseRightButtonUp="PlayerName_RightClick"
+							TextDecorations="">
+							<Hyperlink.Inlines>
+								<Run Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}" />
+							</Hyperlink.Inlines>
+						</Hyperlink>
+					</TextBlock>
+				</StackPanel>
+			</Viewbox>
+
+			<!-- Header Badges: Inventory Value & Encounter badge -->
+			<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
+				<!-- Female / Kadın Simgesi Butonu -->
+				<Border x:Name="FemaleBtn"
+				        Width="38" Height="32"
+				        Visibility="{Binding PlayerCell.FemaleButtonVisibility, ElementName=Self}"
+				        Background="{Binding PlayerCell.FemaleBackground, ElementName=Self}"
+				        BorderBrush="{Binding PlayerCell.FemaleBorder, ElementName=Self}"
+				        BorderThickness="1.5" CornerRadius="9" Margin="0,0,5,0"
+				        VerticalAlignment="Center" Cursor="Hand"
+				        MouseLeftButtonUp="FemaleButton_Click"
+				        ToolTip="{Binding PlayerCell.FemaleTooltip, ElementName=Self}"
+				        ToolTipService.InitialShowDelay="0">
+					<Border.Style>
+						<Style TargetType="Border">
+							<Style.Triggers>
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter Property="Opacity" Value="0.85" />
+								</Trigger>
+							</Style.Triggers>
+						</Style>
+					</Border.Style>
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="8" ShadowDepth="0" Color="#ff79c6"
+						                  Opacity="{Binding PlayerCell.FemaleGlowOpacity, ElementName=Self}" />
+					</Border.Effect>
+					<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Venus"
+						                 PrimaryColor="{Binding PlayerCell.FemaleIconBrush, ElementName=Self}"
+						                 Width="13" Height="13"
+						                 HorizontalAlignment="Center"
+						                 VerticalAlignment="Center" />
+					</Grid>
+				</Border>
+
+				<!-- Male / Erkek Simgesi Butonu (Kız Butonunun Sağında) -->
+				<Border x:Name="MaleBtn"
+				        Width="38" Height="32"
+				        Visibility="{Binding PlayerCell.MaleButtonVisibility, ElementName=Self}"
+				        Background="{Binding PlayerCell.MaleBackground, ElementName=Self}"
+				        BorderBrush="{Binding PlayerCell.MaleBorder, ElementName=Self}"
+				        BorderThickness="1.5" CornerRadius="9" Margin="0,0,5,0"
+				        VerticalAlignment="Center" Cursor="Hand"
+				        MouseLeftButtonUp="MaleButton_Click"
+				        ToolTip="{Binding PlayerCell.MaleTooltip, ElementName=Self}"
+				        ToolTipService.InitialShowDelay="0">
+					<Border.Style>
+						<Style TargetType="Border">
+							<Style.Triggers>
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter Property="Opacity" Value="0.85" />
+								</Trigger>
+							</Style.Triggers>
+						</Style>
+					</Border.Style>
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="8" ShadowDepth="0" Color="#38bdf8"
+						                  Opacity="{Binding PlayerCell.MaleGlowOpacity, ElementName=Self}" />
+					</Border.Effect>
+					<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Mars"
+						                 PrimaryColor="{Binding PlayerCell.MaleIconBrush, ElementName=Self}"
+						                 Width="13" Height="13"
+						                 HorizontalAlignment="Center"
+						                 VerticalAlignment="Center" />
+					</Grid>
+				</Border>
+
+				<!-- Red Restriction / Block Button (Kara Liste Engel Butonu) -->
+				<Border x:Name="BlacklistBtn"
+				        Width="38" Height="32"
+				        Visibility="{Binding PlayerCell.BlacklistButtonVisibility, ElementName=Self}"
+				        Background="{Binding PlayerCell.BlacklistBackground, ElementName=Self}"
+				        BorderBrush="{Binding PlayerCell.BlacklistBorder, ElementName=Self}"
+				        BorderThickness="1.5" CornerRadius="9" Margin="0,0,6,0"
+				        VerticalAlignment="Center" Cursor="Hand"
+				        MouseLeftButtonUp="BlacklistButton_Click"
+				        ToolTip="{Binding PlayerCell.BlacklistTooltip, ElementName=Self}"
+				        ToolTipService.InitialShowDelay="0">
+					<Border.Style>
+						<Style TargetType="Border">
+							<Style.Triggers>
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter Property="Opacity" Value="0.85" />
+								</Trigger>
+							</Style.Triggers>
+						</Style>
+					</Border.Style>
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="8" ShadowDepth="0" Color="#ef4444"
+						                  Opacity="{Binding PlayerCell.BlacklistGlowOpacity, ElementName=Self}" />
+					</Border.Effect>
+					<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Ban"
+						                 PrimaryColor="{Binding PlayerCell.BlacklistIconBrush, ElementName=Self}"
+						                 Width="13" Height="13"
+						                 HorizontalAlignment="Center"
+						                 VerticalAlignment="Center" />
+					</Grid>
+				</Border>
+
+				<!-- Inventory Value Pill / Ultra Rare Badge -->
+				<Border Background="#1c2033"
+				        BorderBrush="{Binding PlayerCell.SkinData.RarityBorderBrush, ElementName=Self}"
+				        BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="0,0,6,0"
+				        VerticalAlignment="Center" Cursor="Hand"
+				        MouseLeftButtonUp="ButtonUpHandler"
+				        ToolTip="{Binding PlayerCell.SkinData.InventorySummaryTooltip, ElementName=Self}"
+				        ToolTipService.InitialShowDelay="0"
+				        Visibility="{Binding PlayerCell.SkinData.InventoryValueVisibility, ElementName=Self}">
+					<Border.Resources>
+						<Style TargetType="ToolTip">
+							<Setter Property="Background" Value="#151928" />
+							<Setter Property="BorderBrush" Value="#ffd700" />
+							<Setter Property="BorderThickness" Value="1.2" />
+							<Setter Property="Foreground" Value="#e6e8ee" />
+							<Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+							<Setter Property="FontSize" Value="12" />
+							<Setter Property="FontWeight" Value="SemiBold" />
+							<Setter Property="Padding" Value="10,8" />
+							<Setter Property="HasDropShadow" Value="True" />
+						</Style>
+					</Border.Resources>
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock Text="{Binding PlayerCell.SkinData.RareBadgeIcon, ElementName=Self}"
+						           FontSize="11" Margin="0,0,4,0"
+						           Visibility="{Binding PlayerCell.SkinData.RareBadgeVisibility, ElementName=Self}" />
+						<TextBlock Text="{Binding PlayerCell.SkinData.TotalValueFormatted, ElementName=Self}"
+						           FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold"
+						           Foreground="{Binding PlayerCell.SkinData.RarityTextBrush, ElementName=Self}" />
+					</StackPanel>
+				</Border>
+
+				<!-- Encounter badge: interactive, note editor on click, last 5 matches hover menu -->
+				<Grid VerticalAlignment="Center">
+					<Border
+						x:Name="EncounterBadge"
+						Padding="7,2"
+						CornerRadius="7"
+						Cursor="Hand"
+						Background="{Binding PlayerCell.EncounterData.Background, ElementName=Self}"
+						Visibility="{Binding PlayerCell.EncounterData.Visible, ElementName=Self}"
+						MouseLeftButtonUp="EncounterBadge_Click"
+						MouseEnter="EncounterBadge_MouseEnter"
+						MouseLeave="EncounterBadge_MouseLeave">
+
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="8" ShadowDepth="0" Color="#f0b232" />
+					</Border.Effect>
+					<TextBlock
+						FontFamily="{StaticResource Nunito}"
+						FontWeight="Bold"
+						Foreground="{Binding PlayerCell.EncounterData.TextColor, ElementName=Self}"
+						Text="{Binding PlayerCell.EncounterData.Summary, ElementName=Self}" />
+				</Border>
+
+				<!-- Note Edit Popup -->
+				<Popup x:Name="NotePopup"
+				       Placement="Bottom"
+				       PlacementTarget="{Binding ElementName=EncounterBadge}"
+				       StaysOpen="False"
+				       AllowsTransparency="True"
+				       PopupAnimation="Fade"
+				       Closed="NotePopup_Closed">
+					<Border Background="#1a1e2f" BorderBrush="#32e2b2" BorderThickness="1.5"
+					        CornerRadius="10" Padding="12" MinWidth="260" MaxWidth="320">
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="12" ShadowDepth="4" Color="Black" Opacity="0.75" />
+						</Border.Effect>
+						<StackPanel>
+							<Grid Margin="0,0,0,8">
+								<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+									<fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#32e2b2" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+									<TextBlock Text="Oyuncu Notu" FontFamily="{StaticResource Nunito}"
+									           FontWeight="Bold" FontSize="14" Foreground="#32e2b2" VerticalAlignment="Center" />
+								</StackPanel>
+								<TextBlock Text="✕" HorizontalAlignment="Right" Cursor="Hand"
+								           Foreground="#9f97b0" FontWeight="Bold" FontSize="14"
+								           MouseLeftButtonUp="CloseNotePopup_Click" />
+							</Grid>
+							<TextBox x:Name="NoteInputBox"
+							         Background="#131622" Foreground="White" CaretBrush="#32e2b2"
+							         BorderBrush="#3a4261" BorderThickness="1"
+							         FontFamily="{StaticResource Nunito}" FontSize="13"
+							         Padding="8,6" Margin="0,0,0,8"
+							         MaxLength="150" AcceptsReturn="False"
+							         KeyDown="NoteInputBox_KeyDown" />
+							<Grid>
+								<TextBlock Text="Enter veya dışarı tıklayınca kaydeder"
+								           FontFamily="{StaticResource Nunito}" FontSize="10"
+								           Foreground="#7a829e" VerticalAlignment="Center" />
+								<Button Content="Kaydet" HorizontalAlignment="Right"
+								        Background="#32e2b2" Foreground="Black" FontWeight="Bold"
+								        FontFamily="{StaticResource Nunito}" FontSize="11"
+								        Padding="10,3" Cursor="Hand" Click="SaveNote_Click">
+									<Button.Template>
+										<ControlTemplate TargetType="Button">
+											<Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+												<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+											</Border>
+										</ControlTemplate>
+									</Button.Template>
+								</Button>
+							</Grid>
+						</StackPanel>
+					</Border>
+				</Popup>
+
+				<!-- Recent Matches Hover Dropdown (Max 5 Matches) -->
+				<Popup x:Name="HistoryPopup"
+				       Placement="Bottom"
+				       PlacementTarget="{Binding ElementName=EncounterBadge}"
+				       StaysOpen="True"
+				       AllowsTransparency="True"
+				       PopupAnimation="Fade"
+				       MouseEnter="HistoryPopup_MouseEnter"
+				       MouseLeave="HistoryPopup_MouseLeave">
+					<Border Background="#161926" BorderBrush="#f0b232" BorderThickness="1.5"
+					        CornerRadius="10" Padding="12" MinWidth="340" MaxWidth="440">
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="16" ShadowDepth="5" Color="Black" Opacity="0.85" />
+						</Border.Effect>
+						<StackPanel>
+							<!-- Başlık ve Karşılaşma Sayısı -->
+							<Grid Margin="0,0,0,6">
+								<TextBlock Text="↻ Karşılaşma Geçmişi" FontFamily="{StaticResource Nunito}"
+								           FontWeight="Bold" FontSize="14" Foreground="#f0b232" />
+								<TextBlock Text="(Son 5 Maç)" HorizontalAlignment="Right"
+								           FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#9f97b0" />
+							</Grid>
+
+							<!-- Varsa Kullanıcı Notu -->
+							<Border Background="#21273d" CornerRadius="6" Padding="8,5" Margin="0,0,0,8"
+							        Visibility="{Binding PlayerCell.EncounterData.NoteVisibility, ElementName=Self}">
+								<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+									<fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#32e2b2" Width="12" Height="12" Margin="0,0,6,0" VerticalAlignment="Center" />
+									<TextBlock Text="{Binding PlayerCell.EncounterData.Note, ElementName=Self}"
+									           FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold"
+									           Foreground="#32e2b2" TextWrapping="Wrap" MaxWidth="240" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+
+							<!-- Özet Karşılaşma Bilgisi -->
+							<TextBlock Text="{Binding PlayerCell.EncounterData.Tooltip, ElementName=Self}"
+							           FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#b2aec5"
+							           TextWrapping="Wrap" Margin="0,0,0,6" />
+
+							<Separator Background="#282f49" Margin="0,2,0,8" />
+
+							<!-- Son 5 Maç Listesi -->
+							<ItemsControl ItemsSource="{Binding PlayerCell.EncounterData.RecentMatches, ElementName=Self}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Border Background="#1e2336" CornerRadius="6" Padding="6,5" Margin="0,3">
+											<Grid>
+												<Grid.ColumnDefinitions>
+													<ColumnDefinition Width="36" />
+													<ColumnDefinition Width="*" />
+													<ColumnDefinition Width="36" />
+												</Grid.ColumnDefinitions>
+
+												<!-- SOLDAKI AJAN LOGOSU: Bizim takımda oynadıysa SOLDA -->
+												<Border Grid.Column="0" Width="30" Height="30" CornerRadius="15"
+												        HorizontalAlignment="Center" VerticalAlignment="Center"
+												        Background="#183630" BorderBrush="#32e2b2" BorderThickness="1.5"
+												        Visibility="{Binding AllyLogoVisibility}">
+													<Border.Clip>
+														<EllipseGeometry Center="15,15" RadiusX="14" RadiusY="14" />
+													</Border.Clip>
+													<Grid>
+														<fa:ImageAwesome Icon="Solid_User" PrimaryColor="#32e2b2" Width="14" Height="14" Opacity="0.6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+														<Image Source="{Binding AgentIcon}" Stretch="UniformToFill"
+														       RenderOptions.BitmapScalingMode="HighQuality" />
+													</Grid>
+												</Border>
+
+												<!-- ORTADAKİ MAÇ DETAYI -->
+												<StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
+													<!-- Üst Satır: Harita (Solda, Belirgin Altın Rengi) & Süre / Tarih (Sağda) -->
+													<Grid>
+														<Grid.ColumnDefinitions>
+															<ColumnDefinition Width="*" />
+															<ColumnDefinition Width="Auto" />
+														</Grid.ColumnDefinitions>
+														<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+															<!-- Harita Küçük Görseli (Varsa) -->
+															<Border Width="20" Height="20" CornerRadius="4" Margin="0,0,5,0"
+															        Background="#181d2f" BorderBrush="#ffd700" BorderThickness="1"
+															        ClipToBounds="True" VerticalAlignment="Center"
+															        Visibility="{Binding MapImageVisibility}">
+																<Image Source="{Binding MapImage}" Stretch="UniformToFill"
+																       RenderOptions.BitmapScalingMode="HighQuality" />
+															</Border>
+															<TextBlock Text="🗺️ " FontSize="10" VerticalAlignment="Center"
+															           Visibility="{Binding MapEmojiVisibility}" />
+															<TextBlock Text="{Binding Map}" FontFamily="{StaticResource Nunito}"
+															           FontSize="11" FontWeight="Bold" Foreground="#ffd700"
+															           TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+														</StackPanel>
+														<StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
+															<TextBlock Text="{Binding RelativeTime}" FontFamily="{StaticResource Nunito}"
+															           FontSize="10" FontWeight="SemiBold" Foreground="#b5aed0" VerticalAlignment="Center"
+															           Visibility="{Binding RelativeTimeVisibility}" />
+															<Border Width="1" Height="9" Background="#4b5375" Margin="5,0" VerticalAlignment="Center"
+															        Visibility="{Binding RelativeTimeVisibility}" />
+															<TextBlock Text="{Binding Date}" FontFamily="{StaticResource Nunito}"
+															           FontSize="10" Foreground="#8f89a3" VerticalAlignment="Center" />
+														</StackPanel>
+													</Grid>
+													<!-- Alt Satır: Takım Durumu (Solda) & Maç Sonucu / Skor (Sağda) -->
+													<Grid Margin="0,3,0,0">
+														<Grid.ColumnDefinitions>
+															<ColumnDefinition Width="*" />
+															<ColumnDefinition Width="Auto" />
+														</Grid.ColumnDefinitions>
+														<TextBlock Grid.Column="0" Text="{Binding TeamText}" FontFamily="{StaticResource Nunito}"
+														           FontSize="10" FontWeight="SemiBold"
+														           Foreground="{Binding TeamColor}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+														<TextBlock Grid.Column="1" Text="{Binding ResultText}" FontFamily="{StaticResource Nunito}"
+														           FontSize="11" FontWeight="Bold"
+														           Foreground="{Binding ResultColor}" Margin="6,0,0,0" VerticalAlignment="Center" />
+													</Grid>
+												</StackPanel>
+
+												<!-- SAĞDAKİ AJAN LOGOSU: Rakip takımda oynadıysa SAĞDA -->
+												<Border Grid.Column="2" Width="30" Height="30" CornerRadius="15"
+												        HorizontalAlignment="Center" VerticalAlignment="Center"
+												        Background="#3b1f1f" BorderBrush="#f05454" BorderThickness="1.5"
+												        Visibility="{Binding EnemyLogoVisibility}">
+													<Border.Clip>
+														<EllipseGeometry Center="15,15" RadiusX="14" RadiusY="14" />
+													</Border.Clip>
+													<Grid>
+														<fa:ImageAwesome Icon="Solid_User" PrimaryColor="#f05454" Width="14" Height="14" Opacity="0.6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+														<Image Source="{Binding AgentIcon}" Stretch="UniformToFill"
+														       RenderOptions.BitmapScalingMode="HighQuality" />
+													</Grid>
+												</Border>
+											</Grid>
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+
+							<!-- Hiç geçmiş maç yoksa -->
+							<TextBlock Text="Henüz kayıtlı maç bulunmuyor."
+							           FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#7a829e"
+							           FontStyle="Italic" HorizontalAlignment="Center" Margin="0,4,0,0"
+							           Visibility="{Binding PlayerCell.EncounterData.NoMatchesVisibility, ElementName=Self}" />
+
+							<TextBlock Text="💡 Not bırakmak veya düzenlemek için tıklayın" FontFamily="{StaticResource Nunito}"
+							           FontSize="10" Foreground="#656c88" HorizontalAlignment="Center" Margin="0,6,0,0" />
+						</StackPanel>
+					</Border>
+				</Popup>
+			</Grid>
+		</StackPanel>
+			<!-- (Kullanici adi Row 0'a, ajan adinin yanina tasindi) -->
+
+
+			<Border
+				Grid.Row="2"
+				Grid.Column="0"
+				Background="#32e2b2" CornerRadius="5"
+				HorizontalAlignment="Left" Padding="2"
+				VerticalAlignment="Bottom">
+				<TextBlock
+					Padding="3"
+					FontFamily="{StaticResource Nunito}"
+					Background="Transparent"
+					FontWeight="Bold"
+					Foreground="Black" FontSize="18"
+					Text="{Binding Path=PlayerCell.AccountLevel, ElementName=Self}" />
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+				</Border.Effect>
+			</Border>
+			<!-- <Viewbox -->
+			<!-- 	Grid.Row="2" -->
+			<!-- 	Grid.Column="1" -->
+			<!-- 	Margin="0,5,0,0" -->
+			<!-- 	HorizontalAlignment="Left" -->
+			<!-- 	VerticalAlignment="Bottom" -->
+			<!-- 	Stretch="Uniform"> -->
+			<Border Background="#4c5b6e" CornerRadius="10" Padding="7"
+			        Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Stretch"
+			        HorizontalAlignment="Stretch" Margin="0,4,10,0" RenderTransformOrigin="0.5,0.5"
+			        Grid.Column="1" MouseLeftButtonUp="ButtonUpHandler"
+			        Visibility="{Binding PlayerCell.WeaponBarVisibility, ElementName=Self}">
+				<Border.RenderTransform>
+					<ScaleTransform ScaleX="1" ScaleY="1" />
+				</Border.RenderTransform>
+				<Border.Triggers>
+					<EventTrigger RoutedEvent="Border.MouseEnter">
+						<BeginStoryboard Storyboard="{StaticResource expandStoryboard}" />
+					</EventTrigger>
+					<EventTrigger RoutedEvent="Border.MouseLeave">
+						<BeginStoryboard Storyboard="{StaticResource shrinkStoryboard}" />
+					</EventTrigger>
+				</Border.Triggers>
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+				</Border.Effect>
+				<!-- 4 silah tek sirada, esit paylasim (hepsi sigar, kirpilmaz) -->
+				<UniformGrid Rows="1" Columns="4">
+					<Grid Margin="2">
+						<Border CornerRadius="6"
+						        BorderBrush="{Binding PlayerCell.SkinData.Slot1BorderBrush, ElementName=Self}"
+						        BorderThickness="{Binding PlayerCell.SkinData.Slot1BorderThickness, ElementName=Self}">
+							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       Source="{Binding PlayerCell.SkinData.Slot1Image, ElementName=Self}"
+							       ToolTip="{Binding PlayerCell.SkinData.Slot1Tooltip, ElementName=Self}"
+							       ToolTipService.InitialShowDelay="0">
+								<Image.Effect>
+									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+								</Image.Effect>
+							</Image>
+						</Border>
+						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
+						           Visibility="{Binding PlayerCell.SkinData.Slot1StarVisibility, ElementName=Self}" />
+					</Grid>
+					<Grid Margin="2">
+						<Border CornerRadius="6"
+						        BorderBrush="{Binding PlayerCell.SkinData.Slot2BorderBrush, ElementName=Self}"
+						        BorderThickness="{Binding PlayerCell.SkinData.Slot2BorderThickness, ElementName=Self}">
+							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       Source="{Binding PlayerCell.SkinData.Slot2Image, ElementName=Self}"
+							       ToolTip="{Binding PlayerCell.SkinData.Slot2Tooltip, ElementName=Self}"
+							       ToolTipService.InitialShowDelay="0">
+								<Image.Effect>
+									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+								</Image.Effect>
+							</Image>
+						</Border>
+						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
+						           Visibility="{Binding PlayerCell.SkinData.Slot2StarVisibility, ElementName=Self}" />
+					</Grid>
+					<Grid Margin="2">
+						<Border CornerRadius="6"
+						        BorderBrush="{Binding PlayerCell.SkinData.Slot3BorderBrush, ElementName=Self}"
+						        BorderThickness="{Binding PlayerCell.SkinData.Slot3BorderThickness, ElementName=Self}">
+							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       Source="{Binding PlayerCell.SkinData.Slot3Image, ElementName=Self}"
+							       ToolTip="{Binding PlayerCell.SkinData.Slot3Tooltip, ElementName=Self}"
+							       ToolTipService.InitialShowDelay="0">
+								<Image.Effect>
+									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+								</Image.Effect>
+							</Image>
+						</Border>
+						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
+						           Visibility="{Binding PlayerCell.SkinData.Slot3StarVisibility, ElementName=Self}" />
+					</Grid>
+					<Grid Margin="2">
+						<Border CornerRadius="6"
+						        BorderBrush="{Binding PlayerCell.SkinData.Slot4BorderBrush, ElementName=Self}"
+						        BorderThickness="{Binding PlayerCell.SkinData.Slot4BorderThickness, ElementName=Self}">
+							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       Source="{Binding PlayerCell.SkinData.Slot4Image, ElementName=Self}"
+							       ToolTip="{Binding PlayerCell.SkinData.Slot4Tooltip, ElementName=Self}"
+							       ToolTipService.InitialShowDelay="0">
+								<Image.Effect>
+									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+								</Image.Effect>
+							</Image>
+						</Border>
+						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
+						           Visibility="{Binding PlayerCell.SkinData.Slot4StarVisibility, ElementName=Self}" />
+					</Grid>
+				</UniformGrid>
+
+			</Border>
+
+			<!-- Lobby Info (shown in lobby when not in match) -->
+			<StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+			            Visibility="{Binding PlayerCell.LobbyInfoVisibility, ElementName=Self}" Margin="0,4,10,0">
+				<!-- Party Leader Badge -->
+				<Border Background="#2b2716" BorderBrush="#ffd700" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="0,0,10,0"
+				        Visibility="{Binding PlayerCell.PartyOwnerVisibility, ElementName=Self}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Crown" PrimaryColor="#ffd700" Width="12" Height="12" Margin="0,0,5,0" VerticalAlignment="Center" />
+						<TextBlock Text="GRUP LİDERİ" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+					</StackPanel>
+				</Border>
+				<!-- Rank Text Badge -->
+				<Border Background="#1b2538" BorderBrush="#3b82f6" BorderThickness="1" CornerRadius="6" Padding="8,4">
+					<TextBlock Text="{Binding PlayerCell.RankData.RankNames[0], ElementName=Self}"
+					           FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#60a5fa" />
+				</Border>
+			</StackPanel>
+
+			<!-- </Viewbox> -->
+
+			<!-- Direct Copy Player Inventory Button (Envanteri Doğrudan Kopyala) -->
+			<Border x:Name="CopyPlayerInvBtn"
+			        Grid.Row="1" Grid.Column="2"
+			        Tag="{Binding PlayerCell, ElementName=Self}"
+			        Visibility="{Binding PlayerCell.WeaponBarVisibility, ElementName=Self}"
+			        VerticalAlignment="Center" HorizontalAlignment="Stretch"
+			        Height="28" Margin="2,1" Padding="4,2"
+			        Background="#192033" BorderBrush="#364366" BorderThickness="1.2"
+			        CornerRadius="6" Cursor="Hand"
+			        MouseLeftButtonUp="CopyPlayerInventory_Click"
+			        MouseUp="CopyPlayerInventory_MouseUp"
+			        MouseRightButtonUp="CopyPlayerInventory_RightClick"
+			        ToolTip="Sol Tık: İsim ve Skinleri Kopyala&#x0a;Shift + Sol Tık: Sadece Oyuncu İsmini Kopyala&#x0a;Orta Tık: Toplam Değerli (VP &amp; TL) Kopyala&#x0a;Sağ Tık: Sadece Uğurlukları Kopyala"
+			        ToolTipService.InitialShowDelay="0">
+				<Border.Style>
+					<Style TargetType="Border">
+						<Style.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Background" Value="#252f4a" />
+								<Setter Property="BorderBrush" Value="#32e2b2" />
+							</Trigger>
+						</Style.Triggers>
+					</Style>
+				</Border.Style>
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="4" ShadowDepth="1" Color="Black" Opacity="0.4" />
+				</Border.Effect>
+				<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+					<StackPanel x:Name="CopyPlayerInvNormalState" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Copy" PrimaryColor="#32e2b2" Width="11" Height="11" Margin="0,0,4,0" VerticalAlignment="Center" />
+						<TextBlock Text="Kopyala" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+					</StackPanel>
+					<StackPanel x:Name="CopyPlayerInvSuccessState" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
+						<TextBlock Text="✓" FontSize="11" FontWeight="Bold" Foreground="#32e2b2" Margin="0,0,3,0" VerticalAlignment="Center" />
+						<TextBlock Text="Kopyalandı!" FontFamily="{StaticResource Nunito}" FontSize="9.5" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+					</StackPanel>
+				</Grid>
+			</Border>
+
+			<UniformGrid
+				Grid.Row="2"
+				Grid.Column="2"
+				Visibility="{Binding PlayerCell.MatchDetailsVisibility, ElementName=Self}"
+				VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Columns="3" Rows="1">
+				<Image
+					Source="{Binding PlayerCell.RankData.RankImages[3], ElementName=Self}"
+					ToolTip="{Binding PlayerCell.RankData.RankNames[3], ElementName=Self}"
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
+					<Image.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Image.Effect>
+				</Image>
+				<Image
+
+					Source="{Binding PlayerCell.RankData.RankImages[2], ElementName=Self}"
+					ToolTip="{Binding PlayerCell.RankData.RankNames[2], ElementName=Self}"
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
+					<Image.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Image.Effect>
+				</Image>
+				<Image
+					Source="{Binding PlayerCell.RankData.RankImages[1], ElementName=Self}"
+					ToolTip="{Binding PlayerCell.RankData.RankNames[1], ElementName=Self}"
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
+					<Image.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Image.Effect>
+				</Image>
+
+			</UniformGrid>
+
+			<UniformGrid
+				Grid.Row="0"
+				Grid.Column="2"
+				Visibility="{Binding PlayerCell.MatchDetailsVisibility, ElementName=Self}"
+				VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Columns="3" Rows="1">
+				<Border CornerRadius="50" VerticalAlignment="Stretch" Padding="4"
+				        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+				        Background="{Binding PlayerCell.MatchHistoryData.PreviousGameColours[2], ElementName=Self}"
+				        BorderThickness="0">
+					<TextBlock FontFamily="{StaticResource Nunito}" FontStretch="UltraCondensed"
+					           Text="{Binding PlayerCell.MatchHistoryData.PreviousGames[2], ElementName=Self}"
+					           Foreground="#252A40" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+				</Border>
+				<Border CornerRadius="50" VerticalAlignment="Stretch" Margin="2, 0" Padding="4"
+				        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+				        Background="{Binding PlayerCell.MatchHistoryData.PreviousGameColours[1], ElementName=Self}"
+				        BorderThickness="0">
+					<TextBlock FontFamily="{StaticResource Nunito}" FontStretch="UltraCondensed"
+					           Text="{Binding PlayerCell.MatchHistoryData.PreviousGames[1], ElementName=Self}"
+					           Foreground="#252A40" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+				</Border>
+				<Border CornerRadius="50" VerticalAlignment="Stretch" Padding="4"
+				        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+				        Background="{Binding PlayerCell.MatchHistoryData.PreviousGameColours[0], ElementName=Self}"
+				        BorderThickness="0">
+					<TextBlock FontFamily="{StaticResource Nunito}" FontStretch="UltraCondensed"
+					           Text="{Binding PlayerCell.MatchHistoryData.PreviousGames[0], ElementName=Self}" Foreground="#252A40"
+					           FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+				</Border>
+
+			</UniformGrid>
+
+			<Border
+				Grid.Row="0"
+				Grid.RowSpan="3"
+				Grid.Column="3"
+				Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
+				Margin="10,0,0,10"
+				HorizontalAlignment="Right"
+				ToolTip="{Binding PlayerCell.RankData.RankNames[0], ElementName=Self}"
+				ToolTipService.InitialShowDelay="0">
+				<Border.Background>
+					<ImageBrush RenderOptions.BitmapScalingMode="HighQuality"
+					            ImageSource="{Binding PlayerCell.RankData.RankImages[0], ElementName=Self}" />
+				</Border.Background>
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+				</Border.Effect>
+				<!-- Peak rank rozeti: guncel rankin sag ust kosesi -->
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="17*" />
+						<RowDefinition Height="23*" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="23*" />
+						<ColumnDefinition Width="17*" />
+					</Grid.ColumnDefinitions>
+					<Border Grid.Row="0" Grid.Column="1"
+					        Background="#2E3349" CornerRadius="100"
+					        ToolTip="{Binding PlayerCell.RankData.PeakRankTooltip, ElementName=Self}"
+					        ToolTipService.InitialShowDelay="0">
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="4" ShadowDepth="1" />
+						</Border.Effect>
+						<Border CornerRadius="100" Margin="2">
+							<Border.Background>
+								<ImageBrush RenderOptions.BitmapScalingMode="HighQuality" Stretch="Uniform"
+								            ImageSource="{Binding PlayerCell.RankData.PeakRankImage, ElementName=Self}" />
+							</Border.Background>
+						</Border>
+					</Border>
+				</Grid>
+			</Border>
+
+			<Border Grid.Row="2" BorderThickness="1" Margin="10,0,0,0"
+			        VerticalAlignment="Bottom" BorderBrush="Gray"
+			        ToolTip="{Binding PlayerCell.MatchHistoryData.RankProgress, ElementName=Self}"
+			        ToolTipService.InitialShowDelay="0"
+			        Grid.Column="3" Height="5.5" CornerRadius="2">
+				<ProgressBar
+					BorderThickness="0"
+					Background="Transparent"
+					Foreground="#32e2b2"
+					Maximum="{Binding PlayerCell.RankData.MaxRr, ElementName=Self}"
+					Minimum="0"
+					Value="{Binding PlayerCell.MatchHistoryData.RankProgress, ElementName=Self}" />
+			</Border>
+
+			<Grid Grid.RowSpan="3" Grid.Row="0" Grid.Column="3" Margin="-15">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="4*" />
+					<ColumnDefinition Width="1*" />
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*" />
+					<RowDefinition Height="4*" />
+				</Grid.RowDefinitions>
+				<Border Background="{Binding PlayerCell.PlayerUiData.PartyColour, ElementName=Self}" Grid.Row="0" Grid.Column="1"
+				        Margin="0"
+				        ToolTip="{Binding PlayerCell.PlayerUiData.PartyTooltip, ElementName=Self}"
+				        ToolTipService.InitialShowDelay="0"
+				        VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0" CornerRadius="0 20 0 10">
+
+					<Image Margin="6">
+						<Image.Source>
+							<DrawingImage>
+								<DrawingImage.Drawing>
+									<DrawingGroup ClipGeometry="M0,0 V512 H640 V0 H0 Z">
+										<GeometryDrawing Brush="{Binding PlayerCell.PlayerUiData.BackgroundColour, ElementName=Self}"
+										                 Geometry="F1 M640,512z M0,0z M96,224C131.3,224 160,195.3 160,160 160,124.7 131.3,96 96,96 60.7,96 32,124.7 32,160 32,195.3 60.7,224 96,224z M544,224C579.3,224 608,195.3 608,160 608,124.7 579.3,96 544,96 508.7,96 480,124.7 480,160 480,195.3 508.7,224 544,224z M576,256L512,256C494.4,256 478.5,263.1 466.9,274.6 507.2,296.7 535.8,336.6 542,384L608,384C625.7,384,640,369.7,640,352L640,320C640,284.7,611.3,256,576,256z M320,256C381.9,256 432,205.9 432,144 432,82.1 381.9,32 320,32 258.1,32 208,82.1 208,144 208,205.9 258.1,256 320,256z M396.8,288L388.5,288C367.7,298 344.6,304 320,304 295.4,304 272.4,298 251.5,288L243.2,288C179.6,288,128,339.6,128,403.2L128,432C128,458.5,149.5,480,176,480L464,480C490.5,480,512,458.5,512,432L512,403.2C512,339.6,460.4,288,396.8,288z M173.1,274.6C161.5,263.1,145.6,256,128,256L64,256C28.7,256,0,284.7,0,320L0,352C0,369.7,14.3,384,32,384L97.9,384C104.2,336.6,132.8,296.7,173.1,274.6z" />
+									</DrawingGroup>
+								</DrawingImage.Drawing>
+							</DrawingImage>
+						</Image.Source>
+					</Image>
+				</Border>
+			</Grid>
+			<Popup Grid.Row="1" Grid.Column="0" x:Name="popup"
+			       Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+			       Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+			       Placement="Center" StaysOpen="False" PopupAnimation="Fade" AllowsTransparency="True"
+			       PlacementTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+		</Grid>
+	</Grid>
+
+	</Border>
+</UserControl>

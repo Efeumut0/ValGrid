@@ -1,0 +1,1154 @@
+<UserControl x:Class="ValGrid.Controls.StoreControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+             xmlns:c="clr-namespace:ValGrid.Controls"
+             x:Name="StoreRoot"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             mc:Ignorable="d" Background="Transparent"
+             d:DesignHeight="850" d:DesignWidth="1400">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <FontFamily x:Key="Nunito">/Assets/#Nunito</FontFamily>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernStoreButton" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Opacity" Value="0.88" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Opacity" Value="0.75" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Pulse animation for waiting spinner -->
+        <Storyboard x:Key="PulseSpinner" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="WaitingIcon"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.4" Duration="0:0:0.9"
+                             AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <!-- Outer Blurred Dimmed Backdrop -->
+    <Grid>
+        <Border Background="#D0080B14" MouseDown="Backdrop_MouseDown" />
+
+        <!-- Main Modal Window -->
+        <Border Margin="50,30,50,30" MaxWidth="1340" MaxHeight="810"
+                Background="#131828" CornerRadius="18"
+                BorderBrush="#293554" BorderThickness="1.5"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="28" ShadowDepth="8" Color="Black" Opacity="0.7" />
+            </Border.Effect>
+
+            <Grid Margin="24,20,24,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />  <!-- Header Row -->
+                    <RowDefinition Height="*" />     <!-- Body Content Row -->
+                </Grid.RowDefinitions>
+
+                <!-- HEADER ROW -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title & Subtitle -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="42" Height="42" CornerRadius="12" Background="#232014"
+                                BorderBrush="#ffd700" BorderThickness="1.2" Margin="0,0,14,0"
+                                VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Solid_CartShopping" PrimaryColor="#ffd700" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock x:Name="StoreMainTitle" Text="GÜNLÜK MAĞAZA" FontFamily="{StaticResource Nunito}" FontSize="20"
+                                           FontWeight="ExtraBold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                <!-- Live Timer Badge with Seconds -->
+                                <Border x:Name="TimerBadge" Margin="14,0,0,0" Padding="10,4"
+                                        Background="#1c2438" CornerRadius="8" BorderBrush="#f59e0b" BorderThickness="1"
+                                        VerticalAlignment="Center" Visibility="Collapsed">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Solid_Hourglass" PrimaryColor="#ffd700" Width="11" Height="11" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="TimerPrefixText" Text="Yenilenmeye: " FontFamily="{StaticResource Nunito}" FontSize="12"
+                                                   FontWeight="SemiBold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="TimerText" Text="--:--:--" FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                                   FontWeight="Bold" Foreground="#fbbf24" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <!-- All Weapons Button (Tüm Silahlar) placed right next to TimerBadge -->
+                                <Button x:Name="AllWeaponsBtn" Click="AllWeapons_Click" Margin="10,0,0,0" Padding="11,4"
+                                        Background="#192238" BorderBrush="#3b82f6" BorderThickness="1.2"
+                                        Cursor="Hand" ToolTip="Oyundaki Tüm Silahları ve Kaplamaları Listele" Style="{StaticResource ModernStoreButton}"
+                                        Visibility="Collapsed">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Solid_Gun" PrimaryColor="#60a5fa" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="AllWeaponsBtnText" Text="Tüm Silahlar" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#93c5fd" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            <TextBlock x:Name="StoreMainSub" Text="Valorant günlük rotasyon skin teklifleriniz ve fiyatları"
+                                       FontFamily="{StaticResource Nunito}" FontSize="12"
+                                       Foreground="#8e9bb5" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- User Wallet Balances & Controls (Right) -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- VP Balance Badge with Official VP PNG Icon -->
+                        <Border x:Name="VpBadge" Margin="0,0,10,0" Padding="10,5"
+                                Background="#1a2236" CornerRadius="8" BorderBrush="#ffd700" BorderThickness="1"
+                                Visibility="Collapsed" ToolTip="Mevcut Valorant Points Bakiyeniz">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Image Source="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/largeicon.png"
+                                       Width="18" Height="18" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True" VerticalAlignment="Center" />
+                                <TextBlock x:Name="VpText" Text="0 VP" FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                           FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- RP Balance Badge with Official RP PNG Icon -->
+                        <Border x:Name="RpBadge" Margin="0,0,10,0" Padding="10,5"
+                                Background="#1a2236" CornerRadius="8" BorderBrush="#38bdf8" BorderThickness="1"
+                                Visibility="Collapsed" ToolTip="Mevcut Radyanit Puanı Bakiyeniz">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Image Source="https://media.valorant-api.com/currencies/e59aa87c-4cbf-517a-5983-6e81511be9b7/largeicon.png"
+                                       Width="18" Height="18" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True" VerticalAlignment="Center" />
+                                <TextBlock x:Name="RpText" Text="0 RP" FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                           FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- KC Balance Badge with Official KC PNG Icon -->
+                        <Border x:Name="KcBadge" Margin="0,0,10,0" Padding="10,5"
+                                Background="#1a2236" CornerRadius="8" BorderBrush="#a78bfa" BorderThickness="1"
+                                Visibility="Collapsed" ToolTip="Mevcut Kingdom Kredisi Bakiyeniz">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Image Source="https://media.valorant-api.com/currencies/85ca954a-41f2-ce94-9b45-8ca3dd39a00d/largeicon.png"
+                                       Width="18" Height="18" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True" VerticalAlignment="Center" />
+                                <TextBlock x:Name="KcText" Text="0 KC" FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                           FontWeight="Bold" Foreground="#c084fc" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Refresh Button -->
+                        <Button x:Name="RefreshBtn" Click="RefreshStore_Click" Margin="0,0,8,0" Padding="9,6"
+                                Background="#1b2236" BorderBrush="#333f63" BorderThickness="1"
+                                Cursor="Hand" ToolTip="Mağazayı Yenile" Style="{StaticResource ModernStoreButton}">
+                            <fa:ImageAwesome x:Name="RefreshIcon" Icon="Solid_Rotate" PrimaryColor="#38bdf8" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+
+                        <!-- Close Button -->
+                        <Button x:Name="StoreCloseBtn" Click="Close_Click" Padding="10,6"
+                                Background="#2d1519" BorderBrush="#ef4444" BorderThickness="1"
+                                Cursor="Hand" ToolTip="Kapat (ESC)" Style="{StaticResource ModernStoreButton}">
+                            <TextBlock Text="✕" FontSize="14" FontWeight="Bold" Foreground="#f87171" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- BODY CONTENT ROW -->
+                <Grid Grid.Row="1">
+                    <!-- 1. WAITING / LAUNCHING RIOT CLIENT PANEL -->
+                    <Border x:Name="WaitingPanel" Background="#161c2e" CornerRadius="14"
+                            BorderBrush="#27324f" BorderThickness="1" Padding="30"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            MaxWidth="520" Visibility="Collapsed">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" ShadowDepth="4" Color="Black" Opacity="0.5" />
+                        </Border.Effect>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Solid_Hourglass" PrimaryColor="#ffd700" Width="40" Height="40" HorizontalAlignment="Center" Margin="0,0,0,16" />
+                            <TextBlock x:Name="WaitingTitle" Text="Riot Client Bekleniyor..."
+                                       FontFamily="{StaticResource Nunito}" FontSize="20" FontWeight="Bold"
+                                       Foreground="#ffd700" HorizontalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock x:Name="WaitingMessage"
+                                       Text="Günlük mağazanızı çekebilmek için Riot Client'a bağlanılıyor. Lütfen Riot Client'ın açılmasını bekleyin..."
+                                       FontFamily="{StaticResource Nunito}" FontSize="13.5"
+                                       Foreground="#cbd5e1" HorizontalAlignment="Center" TextAlignment="Center"
+                                       TextWrapping="Wrap" Margin="0,10,0,24" LineHeight="20" />
+                            
+                            <ProgressBar x:Name="WaitingProgress" IsIndeterminate="True" Height="4"
+                                         Background="#222b42" Foreground="#007EF9" BorderThickness="0"
+                                         Margin="0,0,0,24" />
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Click="Close_Click" Margin="0,0,12,0" Padding="16,8"
+                                        Background="#222b42" BorderBrush="#354469" BorderThickness="1"
+                                        Style="{StaticResource ModernStoreButton}">
+                                    <TextBlock x:Name="WaitingCancelBtnText" Text="İptal Et" />
+                                </Button>
+                                <Button x:Name="RelaunchClientBtn" Click="RelaunchClient_Click" Padding="16,8"
+                                        Background="#007EF9" BorderBrush="#2596be" BorderThickness="1"
+                                        Style="{StaticResource ModernStoreButton}">
+                                    <TextBlock x:Name="RelaunchClientBtnText" Text="Riot Client'ı Başlat" FontWeight="Bold" />
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 2. ERROR STATE PANEL -->
+                    <Border x:Name="ErrorPanel" Background="#1c161d" CornerRadius="14"
+                            BorderBrush="#54252d" BorderThickness="1.2" Padding="30"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            MaxWidth="500" Visibility="Collapsed">
+                        <StackPanel HorizontalAlignment="Center">
+                            <fa:ImageAwesome Icon="Solid_TriangleExclamation" PrimaryColor="#ef4444" Width="42" Height="42" HorizontalAlignment="Center" Margin="0,0,0,14" />
+                            <TextBlock x:Name="StoreErrorTitle" Text="Mağaza Verisi Alınamadı" FontFamily="{StaticResource Nunito}"
+                                       FontSize="19" FontWeight="Bold" Foreground="#f87171"
+                                       HorizontalAlignment="Center" Margin="0,0,0,10" />
+                            <TextBlock x:Name="ErrorMessage" Text="Riot Client oturumunu kontrol edin."
+                                       FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#cbd5e1"
+                                       TextAlignment="Center" TextWrapping="Wrap" LineHeight="18" Margin="0,0,0,22" />
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Click="Close_Click" Margin="0,0,12,0" Padding="16,8"
+                                        Background="#222b42" BorderBrush="#354469" BorderThickness="1"
+                                        Style="{StaticResource ModernStoreButton}">
+                                    <TextBlock x:Name="ErrorCloseBtnText" Text="Kapat" />
+                                </Button>
+                                <Button Click="RefreshStore_Click" Padding="16,8"
+                                        Background="#ef4444" BorderBrush="#f87171" BorderThickness="1"
+                                        Style="{StaticResource ModernStoreButton}">
+                                    <TextBlock x:Name="ErrorRetryBtnText" Text="Tekrar Dene" FontWeight="Bold" />
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 3. STORE LOADED CONTENT (SCROLLABLE) -->
+                    <ScrollViewer x:Name="StoreScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="Collapsed">
+                        <StackPanel Margin="0,0,0,10">
+                            <!-- 1. FEATURED BUNDLE BANNER CAROUSEL (ÖNE ÇIKAN BÜYÜK PAKETLER) -->
+                            <Border x:Name="FeaturedBundlesContainer" Margin="0,0,0,18" CornerRadius="16"
+                                    Background="#111628" BorderBrush="#2e3a59" BorderThickness="1.5"
+                                    ClipToBounds="True" Visibility="Collapsed"
+                                    MouseEnter="BundleCarousel_MouseEnter" MouseLeave="BundleCarousel_MouseLeave">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="4" Color="Black" Opacity="0.55" />
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="205" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- TOP BANNER SLIDE AREA -->
+                                    <Grid Grid.Row="0" x:Name="BundleBannerGrid">
+                                        <!-- Wide Banner Background Art -->
+                                        <Image x:Name="BundleBannerImage" Stretch="UniformToFill" HorizontalAlignment="Right"
+                                               RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                        <!-- Animated Video Banner (e.g. Champions 2026) -->
+                                        <MediaElement x:Name="BundleBannerVideo" Stretch="UniformToFill" HorizontalAlignment="Right"
+                                                      LoadedBehavior="Manual" UnloadedBehavior="Stop"
+                                                      IsMuted="True" ScrubbingEnabled="True" Visibility="Collapsed"
+                                                      MediaEnded="BundleBannerVideo_MediaEnded" />
+
+                                        <!-- Smooth Vignette / Gradient Overlay -->
+                                        <Border>
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#F80A0E1A" Offset="0.0" />
+                                                    <GradientStop Color="#ED0A0E1A" Offset="0.35" />
+                                                    <GradientStop Color="#A00D1526" Offset="0.65" />
+                                                    <GradientStop Color="#250D1526" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <Border>
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                                    <GradientStop Color="#E00A0E1A" Offset="0.0" />
+                                                    <GradientStop Color="#000A0E1A" Offset="0.45" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <!-- Banner Content Overlay (Left) -->
+                                        <Grid Margin="24,16,24,14">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />  <!-- Pills Row -->
+                                                <RowDefinition Height="*" />     <!-- Title & Description -->
+                                                <RowDefinition Height="Auto" />  <!-- Price & Action Row -->
+                                            </Grid.RowDefinitions>
+
+                                            <!-- 1. Top Badges: Featured Pill + Remaining Time + Discount -->
+                                            <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <!-- Golden Featured Badge -->
+                                                <Border Background="#2a2212" BorderBrush="#ffd700" BorderThickness="1"
+                                                        CornerRadius="6" Padding="8,3" Margin="0,0,8,0">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome Icon="Solid_Star" PrimaryColor="#ffd700" Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="BundleFeaturedPillText" Text="ÖNE ÇIKAN PAKET" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="10.5" FontWeight="ExtraBold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Remaining Duration Badge -->
+                                                <Border x:Name="BundleTimerBadge" Background="#161f33" BorderBrush="#38bdf8" BorderThickness="1"
+                                                        CornerRadius="6" Padding="8,3" Margin="0,0,8,0">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome Icon="Solid_Hourglass" PrimaryColor="#38bdf8" Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="BundleTimerText" Text="14 Gün Kaldı" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="10.5" FontWeight="Bold" Foreground="#7dd3fc" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Discount Pill -->
+                                                <Border x:Name="BundleDiscountBadge" Background="#7c3aed" CornerRadius="6" Padding="8,3">
+                                                    <TextBlock x:Name="BundleDiscountText" Text="-%33 İNDİRİM" FontFamily="{StaticResource Nunito}"
+                                                               FontSize="10.5" FontWeight="ExtraBold" Foreground="White" VerticalAlignment="Center" />
+                                                </Border>
+                                            </StackPanel>
+
+                                            <!-- 2. Middle: Large Bold Title & Description -->
+                                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,4,0,4">
+                                                <TextBlock x:Name="BundleTitleText" Text="CHAMPIONS 2026" FontFamily="{StaticResource Nunito}"
+                                                           FontSize="23" FontWeight="Black" Foreground="White" TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.Effect>
+                                                        <DropShadowEffect BlurRadius="10" ShadowDepth="2" Color="Black" Opacity="0.8" />
+                                                    </TextBlock.Effect>
+                                                </TextBlock>
+                                                <TextBlock x:Name="BundleDescText"
+                                                           Text="Champions 2026 Özel Koleksiyonu - Sınırlı Sürüm Turnuva Seti"
+                                                           FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#cbd5e1"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="640" HorizontalAlignment="Left"
+                                                           Margin="0,3,0,0" LineHeight="16" />
+                                            </StackPanel>
+
+                                            <!-- 3. Bottom: Price & Inspect Bundle Items Button -->
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Price Section -->
+                                                <Border Grid.Column="0" Background="#141a2c" CornerRadius="9"
+                                                        BorderBrush="#293758" BorderThickness="1" Padding="12,6" Margin="0,0,14,0">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Image Source="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/largeicon.png"
+                                                               Width="18" Height="18" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="BundleVpText" Text="6.160 VP" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="16" FontWeight="Black" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="BundleBaseVpText" Text="8.025 VP" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11.5" Foreground="#64748b" TextDecorations="Strikethrough"
+                                                                   Margin="8,0,0,0" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="BundleTlText" Text="~₺2.400" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="12" FontWeight="Bold" Foreground="#34d399"
+                                                                   Margin="10,0,0,0" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Toggle Bundle Items Button -->
+                                                <Button Grid.Column="1" x:Name="ToggleBundleItemsBtn" Click="ToggleBundleItems_Click"
+                                                        Padding="14,7" Background="#1e2740" BorderBrush="#3b82f6" BorderThickness="1"
+                                                        Cursor="Hand" HorizontalAlignment="Left" Style="{StaticResource ModernStoreButton}"
+                                                        ToolTip="Paket içindeki silahları ve eşyaları listele">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome Icon="Solid_BoxesStacked" PrimaryColor="#60a5fa" Width="13" Height="13" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="ToggleBundleItemsText" Text="Paket İçeriğini Görüntüle"
+                                                                   FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#93c5fd" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+
+                                                <!-- Carousel Navigation Arrows & Indicators -->
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Prev Button -->
+                                                    <Button Click="PrevBundle_Click" Margin="0,0,6,0" Padding="8,6"
+                                                            Background="#172036" BorderBrush="#2e3d61" BorderThickness="1"
+                                                            Cursor="Hand" Style="{StaticResource ModernStoreButton}" ToolTip="Önceki Paket">
+                                                        <fa:ImageAwesome Icon="Solid_ChevronLeft" PrimaryColor="#cbd5e1" Width="10" Height="10" />
+                                                    </Button>
+
+                                                    <!-- Slide Indicator -->
+                                                    <Border Background="#121829" CornerRadius="6" Padding="8,4" Margin="0,0,6,0" BorderBrush="#263454" BorderThickness="1">
+                                                        <TextBlock x:Name="BundleSlideIndexText" Text="1 / 2" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" FontWeight="Bold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                                    </Border>
+
+                                                    <!-- Next Button -->
+                                                    <Button Click="NextBundle_Click" Padding="8,6"
+                                                            Background="#172036" BorderBrush="#2e3d61" BorderThickness="1"
+                                                            Cursor="Hand" Style="{StaticResource ModernStoreButton}" ToolTip="Sonraki Paket">
+                                                        <fa:ImageAwesome Icon="Solid_ChevronRight" PrimaryColor="#cbd5e1" Width="10" Height="10" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+
+                                    <!-- BOTTOM EXPANDABLE BUNDLE ITEMS DRAWER -->
+                                    <Border Grid.Row="1" x:Name="BundleItemsDrawer" Background="#0b0f1c"
+                                            BorderBrush="#1e2840" BorderThickness="0,1,0,0" Padding="14,12"
+                                            Visibility="Collapsed">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4,0,0,8">
+                                                <fa:ImageAwesome Icon="Solid_Gun" PrimaryColor="#38bdf8" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="BundleDrawerTitle" Text="PAKET İÇERİĞİNDEKİ SİLAHLAR VE EŞYALAR" FontFamily="{StaticResource Nunito}"
+                                                           FontSize="12" FontWeight="Bold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="BundleDrawerSub" Text="• Tıklayarak inceleyebilir ve seviye videolarını izleyebilirsiniz"
+                                                           FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#38bdf8"
+                                                           Margin="8,0,0,0" VerticalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <ItemsControl x:Name="BundleItemsList">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Columns="4" Margin="0" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Margin="5" Padding="10,10" CornerRadius="10"
+                                                                Background="{Binding TierBackgroundBrush}"
+                                                                BorderBrush="{Binding TierBorderBrush}"
+                                                                BorderThickness="1.2"
+                                                                Cursor="Hand"
+                                                                PreviewMouseLeftButtonUp="SkinCard_Click"
+                                                                ToolTip="Tıklayarak incele ve videosunu izle">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto" />
+                                                                    <RowDefinition Height="75" />
+                                                                    <RowDefinition Height="Auto" />
+                                                                    <RowDefinition Height="Auto" />
+                                                                </Grid.RowDefinitions>
+                                                                <Grid Grid.Row="0">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding WeaponType}" FontFamily="{StaticResource Nunito}"
+                                                                               FontSize="10" FontWeight="Bold" Foreground="#94a3b8" />
+                                                                    <Border Grid.Column="1" Background="#14532d" BorderBrush="#22c55e" BorderThickness="1"
+                                                                            CornerRadius="4" Padding="5,1" Visibility="{Binding BundleDiscountVisibility}" VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding DiscountPercentText}" FontFamily="{StaticResource Nunito}"
+                                                                                   FontSize="9" FontWeight="Bold" Foreground="#4ade80" />
+                                                                    </Border>
+                                                                </Grid>
+                                                                <Image Grid.Row="1" Source="{Binding Image}" Stretch="Uniform" Margin="2"
+                                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                                                <TextBlock Grid.Row="2" Text="{Binding Name}" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="12" FontWeight="Bold" Foreground="White"
+                                                                           TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                                                <Grid Grid.Row="3" Margin="0,5,0,0">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <Image Source="{Binding VpIconUrl}" Width="12" Height="12" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding VpCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                                   FontSize="11.5" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                    <TextBlock Grid.Column="1" Text="{Binding BundleDiscountedCostFormatted, StringFormat='{}Paket: {0}'}"
+                                                                               FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold"
+                                                                               Foreground="#38bdf8" VerticalAlignment="Center" Visibility="{Binding BundleDiscountVisibility}" />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Daily Offers Section Header -->
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,12">
+                                <TextBlock x:Name="DailyOffersTitleText" Text="GÜNLÜK TEKLİFLER (4 SİLAH)" FontFamily="{StaticResource Nunito}"
+                                           FontSize="13" FontWeight="Bold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                <TextBlock x:Name="DailyOffersSubText" Text="• İncelemek ve videosunu izlemek için bir silaha tıklayın"
+                                           FontFamily="{StaticResource Nunito}" FontSize="11.5" Foreground="#38bdf8"
+                                           Margin="10,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- 4 Daily Skin Cards Grid -->
+                            <ItemsControl x:Name="DailyOffersList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="4" Margin="0" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="6" Padding="14,14" CornerRadius="14"
+                                                Background="{Binding TierBackgroundBrush}"
+                                                BorderBrush="{Binding TierBorderBrush}"
+                                                BorderThickness="1.5"
+                                                Cursor="Hand"
+                                                PreviewMouseLeftButtonUp="SkinCard_Click"
+                                                ToolTip="Tıklayarak incele, seviyeleri ve videoları görüntüle">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="12" ShadowDepth="3" Color="Black" Opacity="0.45" />
+                                            </Border.Effect>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />  <!-- Weapon Type & Tier Header -->
+                                                    <RowDefinition Height="130" />   <!-- Weapon Image -->
+                                                    <RowDefinition Height="Auto" />  <!-- Skin Name & Tier -->
+                                                    <RowDefinition Height="Auto" />  <!-- Price -->
+                                                    <RowDefinition Height="Auto" />  <!-- Inspect Hint -->
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top Header: Tier Icon + Weapon Type + Rarity Pill -->
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Image Source="{Binding TierIconUrl}" Width="16" Height="16" Margin="0,0,6,0"
+                                                               RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding WeaponType}"
+                                                                   FontFamily="{StaticResource Nunito}" FontSize="11.5"
+                                                                   FontWeight="ExtraBold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                                    </StackPanel>
+
+                                                    <!-- Rarity Pill -->
+                                                    <Border Grid.Column="1" Background="#282214" BorderBrush="#ffd700"
+                                                            BorderThickness="1" CornerRadius="6" Padding="6,2"
+                                                            Visibility="{Binding RareVisibility}">
+                                                        <TextBlock Text="{Binding RarityLabel}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="10" FontWeight="Bold" Foreground="#ffd700" />
+                                                    </Border>
+                                                </Grid>
+
+                                                <!-- Weapon Skin Image -->
+                                                <Image Grid.Row="1" Source="{Binding Image}" Stretch="Uniform"
+                                                       Margin="6,8,6,8" RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                                <!-- Skin Name & Edition -->
+                                                <StackPanel Grid.Row="2" Margin="0,4,0,8">
+                                                    <TextBlock Text="{Binding Name}" FontFamily="{StaticResource Nunito}"
+                                                               FontSize="14.5" FontWeight="Bold" Foreground="White"
+                                                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                                                    <TextBlock Text="{Binding TierDisplayName, StringFormat='{}• {0}'}"
+                                                               FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                               FontWeight="SemiBold" Foreground="{Binding TierBorderBrush}" Margin="0,2,0,0" />
+                                                </StackPanel>
+
+                                                <!-- Price Section -->
+                                                <Border Grid.Row="3" Background="#131726" CornerRadius="9"
+                                                        BorderBrush="#252d45" BorderThickness="1" Padding="10,6">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <!-- VP Price with Official VP PNG Icon -->
+                                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Image Source="{Binding VpIconUrl}" Width="15" Height="15" Margin="0,0,5,0"
+                                                                   RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding VpCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="13.5" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                        <!-- TL Equivalent -->
+                                                        <TextBlock Grid.Column="1" Text="{Binding TlCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11.5" FontWeight="SemiBold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Inspect Action Pill -->
+                                                <Border Grid.Row="4" Margin="0,7,0,0" Background="#141c2e" CornerRadius="6"
+                                                        Padding="6,3" HorizontalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome Icon="Solid_Film" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="İncele &amp; Video" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 4. NIGHT MARKET (GECE PAZARI) SECTION (If Active or Saved/Demo) -->
+                            <Border x:Name="NightMarketContainer" Margin="0,18,0,0" Padding="14,14"
+                                    Background="#141126" CornerRadius="16" BorderBrush="#8b5cf6" BorderThickness="1.5"
+                                    Visibility="Collapsed">
+                                <StackPanel>
+                                    <Grid Margin="4,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <fa:ImageAwesome Icon="Solid_Moon" PrimaryColor="#c084fc" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="NightMarketTitleText" Text="GECE PAZARI (NIGHT MARKET)" FontFamily="{StaticResource Nunito}"
+                                                       FontSize="14" FontWeight="ExtraBold" Foreground="#c084fc" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="NightMarketSubtitleText" Text="• İndirimli Özel Teklifler (Kartı çevirmek ve incelemek için tıklayın)" FontFamily="{StaticResource Nunito}"
+                                                       FontSize="12" FontWeight="SemiBold" Foreground="#94a3b8" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <!-- Right Action Button: Reveal All -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <!-- Reveal All Button -->
+                                            <Button x:Name="RevealAllNightMarketBtn" Click="RevealAllNightMarket_Click"
+                                                    Padding="11,4" Background="#281745" BorderBrush="#a855f7" BorderThickness="1"
+                                                    Cursor="Hand" Style="{StaticResource ModernStoreButton}"
+                                                    ToolTip="Tüm kapalı Gece Pazarı kartlarını animasyonla aç">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <fa:ImageAwesome Icon="Solid_WandMagicSparkles" PrimaryColor="#e9d5ff" Width="12" Height="12" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                    <TextBlock x:Name="RevealAllNightMarketText" Text="Tümünü Çevir" FontFamily="{StaticResource Nunito}" FontSize="11.5" FontWeight="Bold" Foreground="#e9d5ff" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- 6 Night Market Cards Grid with Dynamic Tier Colors -->
+                                    <ItemsControl x:Name="NightMarketList">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="6" Margin="0" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="CardBorder" Margin="5" Padding="10,10" CornerRadius="12"
+                                                        Background="{Binding TierBackgroundBrush}"
+                                                        BorderBrush="{Binding TierBorderBrush}"
+                                                        BorderThickness="1.5"
+                                                        Cursor="Hand"
+                                                        RenderTransformOrigin="0.5,0.5"
+                                                        PreviewMouseLeftButtonUp="NightMarketCard_Click"
+                                                        ToolTip="Tıklayarak kartı çevir veya incele">
+                                                    <Border.RenderTransform>
+                                                        <ScaleTransform x:Name="CardScale" ScaleX="1.0" ScaleY="1.0" />
+                                                    </Border.RenderTransform>
+                                                    <Grid>
+                                                        <!-- 1. MYSTERY CARD BACK (KAPALI KART) -->
+                                                        <Grid Visibility="{Binding CardBackVisibility}" MinHeight="170">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="*" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Discount Hint Pill -->
+                                                            <Border Grid.Row="0" HorizontalAlignment="Right"
+                                                                    Background="#7c3aed" CornerRadius="6" Padding="6,2">
+                                                                <TextBlock Text="{Binding DiscountPercentText}" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="11" FontWeight="Bold" Foreground="White" />
+                                                            </Border>
+
+                                                            <!-- Center Mystery Emblem -->
+                                                            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,12">
+                                                                <Border Width="46" Height="46" CornerRadius="23"
+                                                                        Background="#25163f" BorderBrush="#a855f7" BorderThickness="1.2"
+                                                                        HorizontalAlignment="Center" Margin="0,0,0,8">
+                                                                    <fa:ImageAwesome Icon="Solid_Moon" PrimaryColor="#c084fc" Width="20" Height="20"
+                                                                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                </Border>
+                                                                <TextBlock Text="KARTI ÇEVİR" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="11.5" FontWeight="ExtraBold" Foreground="#e9d5ff" HorizontalAlignment="Center" />
+                                                                <TextBlock Text="Tıkla ve Aç" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="10" Foreground="#a78bfa" HorizontalAlignment="Center" Margin="0,2,0,0" />
+                                                            </StackPanel>
+
+                                                            <!-- Mystery VP Pill -->
+                                                            <Border Grid.Row="2" Background="#1c162e" CornerRadius="6" Padding="7,3" HorizontalAlignment="Center">
+                                                                <TextBlock Text="??? VP" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="11" FontWeight="Bold" Foreground="#a78bfa" />
+                                                            </Border>
+                                                        </Grid>
+
+                                                        <!-- 2. REVEALED CARD FRONT (AÇIK KART) -->
+                                                        <Grid Visibility="{Binding CardFrontVisibility}">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="90" />
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Header: Tier Icon + Discount Badge -->
+                                                            <Grid Grid.Row="0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <!-- Tier Icon -->
+                                                                <Image Grid.Column="0" Source="{Binding TierIconUrl}" Width="15" Height="15"
+                                                                       HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                                                <!-- Discount Badge -->
+                                                                <Border Grid.Column="1" HorizontalAlignment="Right"
+                                                                        Background="#7c3aed" CornerRadius="6" Padding="6,2">
+                                                                    <TextBlock Text="{Binding DiscountPercentText}" FontFamily="{StaticResource Nunito}"
+                                                                               FontSize="11" FontWeight="Bold" Foreground="White" />
+                                                                </Border>
+                                                            </Grid>
+
+                                                            <!-- Weapon Image -->
+                                                            <Image Grid.Row="1" Source="{Binding Image}" Stretch="Uniform" Margin="4"
+                                                                   RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                                            <!-- Skin Name -->
+                                                            <TextBlock Grid.Row="2" Text="{Binding Name}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="12" FontWeight="Bold" Foreground="White"
+                                                                       TextTrimming="CharacterEllipsis" Margin="0,4,0,6" />
+
+                                                            <!-- Price with VP icon -->
+                                                            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                                <TextBlock Text="{Binding OriginalVpCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="10.5" Foreground="#64748b" TextDecorations="Strikethrough"
+                                                                           Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                                <Image Source="{Binding VpIconUrl}" Width="13" Height="13" Margin="0,0,4,0"
+                                                                       RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding VpCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                           FontSize="12" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- 4. TÜM SİLAHLAR (ALL WEAPONS & SKINS CATALOG) EXPLORER PANEL -->
+                    <Grid x:Name="AllWeaponsPanel" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" /> <!-- Filter & Search Controls Header -->
+                            <RowDefinition Height="*" />    <!-- Skins Grid / ScrollViewer -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Filter & Search Controls -->
+                        <Border Grid.Row="0" Margin="0,0,0,12" Padding="12,8"
+                                Background="#111628" CornerRadius="12" BorderBrush="#25324e" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />  <!-- Back to Store Button -->
+                                    <ColumnDefinition Width="220" />   <!-- Search Box -->
+                                    <ColumnDefinition Width="Auto" />  <!-- Weapon Filter -->
+                                    <ColumnDefinition Width="Auto" />  <!-- Tier Filter -->
+                                    <ColumnDefinition Width="*" />     <!-- Count Badge / Stats -->
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Back to Store Button -->
+                                <Button Grid.Column="0" Click="BackToStore_Click" Margin="0,0,12,0" Padding="12,6"
+                                        Background="#1c253b" BorderBrush="#38bdf8" BorderThickness="1"
+                                        Cursor="Hand" Style="{StaticResource ModernStoreButton}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Solid_ArrowLeft" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="BackToStoreText" Text="Mağazaya Dön" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- Search Box -->
+                                <Border Grid.Column="1" Background="#161c2d" CornerRadius="8" BorderBrush="#2b3956" BorderThickness="1" Padding="8,4" Margin="0,0,12,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <fa:ImageAwesome Grid.Column="0" Icon="Solid_MagnifyingGlass" PrimaryColor="#64748b" Width="12" Height="12" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBox Grid.Column="1" x:Name="CatalogSearchBox" TextChanged="CatalogSearch_TextChanged"
+                                                 Background="Transparent" Foreground="White" BorderThickness="0"
+                                                 FontFamily="{StaticResource Nunito}" FontSize="12.5" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" x:Name="CatalogSearchPlaceholder" Text="Skin adı ara..." Foreground="#64748b"
+                                                   FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                                   IsHitTestVisible="False" VerticalAlignment="Center" />
+                                        <Button Grid.Column="2" x:Name="ClearSearchBtn" Click="ClearSearch_Click" Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" Padding="2" Visibility="Collapsed">
+                                            <TextBlock Text="✕" FontSize="11" Foreground="#94a3b8" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Weapon Category ComboBox -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="CatalogWeaponLabel" Text="Silah:" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold" Foreground="#94a3b8" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <ComboBox x:Name="CatalogWeaponFilter" SelectionChanged="CatalogFilter_Changed"
+                                              Width="135" Height="28" Background="#161c2d" Foreground="Black"
+                                              FontFamily="{StaticResource Nunito}" FontSize="11.5">
+                                        <ComboBoxItem Content="Tüm Silahlar" IsSelected="True" />
+                                        <ComboBoxItem Content="Vandal" />
+                                        <ComboBoxItem Content="Phantom" />
+                                        <ComboBoxItem Content="Yakın Dövüş" />
+                                        <ComboBoxItem Content="Operator" />
+                                        <ComboBoxItem Content="Sheriff" />
+                                        <ComboBoxItem Content="Spectre" />
+                                        <ComboBoxItem Content="Ghost" />
+                                        <ComboBoxItem Content="Classic" />
+                                        <ComboBoxItem Content="Guardian" />
+                                        <ComboBoxItem Content="Marshal" />
+                                        <ComboBoxItem Content="Outlaw" />
+                                        <ComboBoxItem Content="Ares" />
+                                        <ComboBoxItem Content="Odin" />
+                                        <ComboBoxItem Content="Bulldog" />
+                                        <ComboBoxItem Content="Judge" />
+                                        <ComboBoxItem Content="Bucky" />
+                                        <ComboBoxItem Content="Frenzy" />
+                                        <ComboBoxItem Content="Stinger" />
+                                        <ComboBoxItem Content="Shorty" />
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Tier Filter ComboBox -->
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="CatalogTierLabel" Text="Seri:" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold" Foreground="#94a3b8" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <ComboBox x:Name="CatalogTierFilter" SelectionChanged="CatalogFilter_Changed"
+                                              Width="125" Height="28" Background="#161c2d" Foreground="Black"
+                                              FontFamily="{StaticResource Nunito}" FontSize="11.5">
+                                        <ComboBoxItem Content="Tüm Seriler" IsSelected="True" />
+                                        <ComboBoxItem Content="Ultra Seri" />
+                                        <ComboBoxItem Content="Seçkin Seri" />
+                                        <ComboBoxItem Content="İhtişamlı Seri" />
+                                        <ComboBoxItem Content="Üstün Seri" />
+                                        <ComboBoxItem Content="Özel Seri" />
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Total / Filtered Count Badge -->
+                                <Border Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Background="#171f33" CornerRadius="8" Padding="10,4" BorderBrush="#2e3e61" BorderThickness="1">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <fa:ImageAwesome Icon="Solid_LayerGroup" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="CatalogCountText" Text="0 Kaplama" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#e2e8f0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Catalog Skin Grid (Scrollable) -->
+                        <ScrollViewer Grid.Row="1" x:Name="CatalogScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl x:Name="CatalogSkinsList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="4" Margin="0" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="6" Padding="12,12" CornerRadius="12"
+                                                Background="{Binding TierBackgroundBrush}"
+                                                BorderBrush="{Binding TierBorderBrush}"
+                                                BorderThickness="1.5"
+                                                Cursor="Hand"
+                                                PreviewMouseLeftButtonUp="SkinCard_Click"
+                                                ToolTip="Tıklayarak incele, seviye videolarını ve renk varyantlarını izle">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Color="Black" Opacity="0.4" />
+                                            </Border.Effect>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />  <!-- Weapon Type + Tier -->
+                                                    <RowDefinition Height="115" />   <!-- Weapon Image -->
+                                                    <RowDefinition Height="Auto" />  <!-- Skin Name -->
+                                                    <RowDefinition Height="Auto" />  <!-- Price -->
+                                                    <RowDefinition Height="Auto" />  <!-- Watch Video Pill -->
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Header: Tier Icon + Weapon Type -->
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Image Source="{Binding TierIconUrl}" Width="15" Height="15" Margin="0,0,5,0"
+                                                               RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding WeaponType}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" FontWeight="ExtraBold" Foreground="#94a3b8" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding TierDisplayName}" FontFamily="{StaticResource Nunito}"
+                                                               FontSize="10" FontWeight="Bold" Foreground="{Binding TierBorderBrush}" VerticalAlignment="Center" />
+                                                </Grid>
+
+                                                <!-- Weapon Image -->
+                                                <Image Grid.Row="1" Source="{Binding Image}" Stretch="Uniform" Margin="4,6,4,6"
+                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                                <!-- Skin Name -->
+                                                <TextBlock Grid.Row="2" Text="{Binding Name}" FontFamily="{StaticResource Nunito}"
+                                                           FontSize="13.5" FontWeight="Bold" Foreground="White"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,2,0,6" ToolTip="{Binding Name}" />
+
+                                                <!-- Price Section -->
+                                                <Border Grid.Row="3" Background="#131726" CornerRadius="8" BorderBrush="#252d45" BorderThickness="1" Padding="8,5">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Image Source="{Binding VpIconUrl}" Width="14" Height="14" Margin="0,0,5,0"
+                                                                   RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding VpCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="12.5" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding TlCostFormatted}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" FontWeight="SemiBold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Inspect & Video Button Pill -->
+                                                <Border Grid.Row="4" Margin="0,6,0,0" Background="#141c2e" CornerRadius="6"
+                                                        Padding="6,3" HorizontalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <fa:ImageAwesome Icon="Solid_Film" PrimaryColor="#38bdf8" Width="10" Height="10" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="İncele &amp; Video" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="10.5" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 5. FULL IN-GAME SKIN INSPECT OVERLAY (VIDEOS, LEVELS, CHROMAS) -->
+        <c:SkinInspectControl x:Name="InspectOverlay" Panel.ZIndex="5000" Visibility="Collapsed" IsHitTestVisible="False" />
+
+        <!-- 6. FULL PLAYER CARD INSPECT OVERLAY (DİKEY, YATAY, KARE) -->
+        <Grid x:Name="PlayerCardOverlay" Panel.ZIndex="5100" Visibility="Collapsed">
+            <!-- Blurred Backdrop -->
+            <Border Background="#E6080B14" MouseDown="ClosePlayerCard_Click" />
+
+            <!-- Card Window -->
+            <Border Margin="40,25,40,25" MaxWidth="1120" MaxHeight="800"
+                    Background="#121727" CornerRadius="18"
+                    BorderBrush="#3b4261" BorderThickness="1.5"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" ShadowDepth="6" Color="Black" Opacity="0.75" />
+                </Border.Effect>
+
+                <Grid Margin="24,20,24,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />  <!-- Header: Card Name, Type, Close -->
+                        <RowDefinition Height="*" />     <!-- Card Art Views (Dikey, Yatay, Kare) -->
+                        <RowDefinition Height="Auto" />  <!-- Footer: Info, Pricing, Description -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Header Row -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="#2a1f47" CornerRadius="6" Padding="8,3" Margin="0,0,10,0">
+                                    <TextBlock x:Name="PlayerCardBadgeText" Text="OYUNCU KARTI" FontFamily="{StaticResource Nunito}"
+                                               FontSize="11" FontWeight="ExtraBold" Foreground="#c084fc" />
+                                 </Border>
+                                 <TextBlock x:Name="PlayerCardTitle" Text="Kart İsmi"
+                                            FontFamily="{StaticResource Nunito}" FontSize="22" FontWeight="ExtraBold"
+                                            Foreground="White" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="PlayerCardSubText" Text="Oyuncu kartının profilde, lobide ve simge olarak tüm görünüm formatları"
+                                       FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" Margin="0,3,0,0" />
+                        </StackPanel>
+
+                        <Button x:Name="PlayerCardCloseBtn" Grid.Column="1" Click="ClosePlayerCard_Click" Padding="12,6"
+                                Background="#2d1519" BorderBrush="#ef4444" BorderThickness="1"
+                                Cursor="Hand" ToolTip="Kapat (ESC)" Style="{StaticResource ModernStoreButton}">
+                            <TextBlock Text="✕" FontSize="15" FontWeight="Bold" Foreground="#f87171" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Card Art Views Row -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280" />  <!-- Dikey (Tall Profile Art) -->
+                            <ColumnDefinition Width="18" />   <!-- Gap -->
+                            <ColumnDefinition Width="*" />    <!-- Yatay (Wide Art) + Kare (Small Art) -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 1. DİKEY GÖRÜNÜM (Large Art / Profil & Envanter) -->
+                        <Border Grid.Column="0" Background="#0b0e1b" CornerRadius="14"
+                                BorderBrush="#29334f" BorderThickness="1.2" Padding="14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Header Pill -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                                    <fa:ImageAwesome Icon="Solid_IdCard" PrimaryColor="#38bdf8" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="CardVerticalTitle" Text="DİKEY GÖRÜNÜM (PROFİL)" FontFamily="{StaticResource Nunito}"
+                                               FontSize="12" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <!-- Large Card Image -->
+                                <Border Grid.Row="1" Background="#05070d" CornerRadius="10" ClipToBounds="True"
+                                        BorderBrush="#1f273d" BorderThickness="1" HorizontalAlignment="Center">
+                                    <Image x:Name="PlayerCardLargeImg" Stretch="Uniform"
+                                           RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Border>
+
+                                <TextBlock x:Name="CardVerticalSub" Grid.Row="2" Text="Profil &amp; Envanter Görünümü (Tam Boyut)"
+                                           FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#64748b"
+                                           HorizontalAlignment="Center" Margin="0,8,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <!-- 2. YATAY VE KARE GÖRÜNÜMLER (Right Column) -->
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />   <!-- Yatay (Wide Banner) -->
+                                <RowDefinition Height="14" />  <!-- Gap -->
+                                <RowDefinition Height="Auto" /> <!-- Kare (Small Avatar Icon) -->
+                            </Grid.RowDefinitions>
+
+                            <!-- YATAY GÖRÜNÜM (Wide Art / Lobi & Karşılaşma) -->
+                            <Border Grid.Row="0" Background="#0b0e1b" CornerRadius="14"
+                                    BorderBrush="#29334f" BorderThickness="1.2" Padding="14">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                        <fa:ImageAwesome Icon="Solid_RectangleAd" PrimaryColor="#a855f7" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="CardHorizontalTitle" Text="YATAY GÖRÜNÜM (LOBİ &amp; KARŞILAŞMA)" FontFamily="{StaticResource Nunito}"
+                                                   FontSize="12" FontWeight="Bold" Foreground="#c084fc" VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <Border Grid.Row="1" Background="#05070d" CornerRadius="10" ClipToBounds="True"
+                                            BorderBrush="#1f273d" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Image x:Name="PlayerCardWideImg" Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality" MaxHeight="220" />
+                                    </Border>
+
+                                    <TextBlock x:Name="CardHorizontalSub" Grid.Row="2" Text="Lobi Başlığı ve Karşılaşma Yükleme Ekranı Banner'ı"
+                                               FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#64748b"
+                                               Margin="0,6,0,0" />
+                                </Grid>
+                            </Border>
+
+                            <!-- KARE GÖRÜNÜM (Small Art / Avatar) -->
+                            <Border Grid.Row="2" Background="#0b0e1b" CornerRadius="14"
+                                    BorderBrush="#29334f" BorderThickness="1.2" Padding="14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Square Avatar Image -->
+                                    <Border Grid.Column="0" Width="90" Height="90" Background="#05070d"
+                                            CornerRadius="12" ClipToBounds="True" BorderBrush="#38bdf8" BorderThickness="1.5">
+                                        <Image x:Name="PlayerCardSmallImg" Stretch="UniformToFill"
+                                               RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </Border>
+
+                                    <!-- Details -->
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <fa:ImageAwesome Icon="Solid_User" PrimaryColor="#38bdf8" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="CardSquareTitle" Text="KARE GÖRÜNÜM (AVATAR &amp; SİMGE)" FontFamily="{StaticResource Nunito}"
+                                                       FontSize="12.5" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="CardSquareSub" Text="Arkadaş listesinde, grup lobisinde ve sohbet pencerelerinde kullanılan avatar simgesi."
+                                                   FontFamily="{StaticResource Nunito}" FontSize="11.5" Foreground="#94a3b8" TextWrapping="Wrap" LineHeight="16" />
+                                        <Border Background="#161e31" CornerRadius="6" Padding="8,3" HorizontalAlignment="Left" Margin="0,6,0,0">
+                                            <TextBlock x:Name="CardSquarePill" Text="Standart Kare En-Boy Oranı" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold" Foreground="#38bdf8" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Footer: Price & Details -->
+                    <Border Grid.Row="2" Margin="0,14,0,0" Background="#0d1120" CornerRadius="12"
+                            BorderBrush="#242c44" BorderThickness="1" Padding="14,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_CircleInfo" PrimaryColor="#64748b" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="CardFooterInfo" Text="Bu kart paket içeriğinde veya mağaza rotasyonunda yer almaktadır."
+                                           FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <!-- VP Badge -->
+                                <Border Background="#1a2236" CornerRadius="8"
+                                        BorderBrush="#ffd700" BorderThickness="1" Padding="10,5" Margin="0,0,8,0">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Image Source="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/largeicon.png"
+                                               Width="16" Height="16" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="PlayerCardVpText" Text="375 VP" FontFamily="{StaticResource Nunito}"
+                                                   FontSize="12.5" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- TL Badge -->
+                                <Border Background="#142826" CornerRadius="8" BorderBrush="#32e2b2" BorderThickness="1" Padding="10,5">
+                                    <TextBlock x:Name="PlayerCardTlText" Text="~75 ₺" FontFamily="{StaticResource Nunito}"
+                                               FontSize="11.5" FontWeight="SemiBold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
+

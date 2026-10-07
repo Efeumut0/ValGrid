@@ -1,0 +1,1066 @@
+<UserControl x:Class="ValGrid.Controls.PlayerListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+             x:Name="PlayerListRoot"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             mc:Ignorable="d" Background="Transparent"
+             d:DesignHeight="850" d:DesignWidth="1400">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <FontFamily x:Key="Nunito">/Assets/#Nunito</FontFamily>
+
+        <!-- Riot Status Dot Pulse Animation (Green - Connected) -->
+        <Storyboard x:Key="PulseGreen" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="RiotStatusDot"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.3" Duration="0:0:0.9"
+                             AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Riot Status Dot Pulse Animation (Red - Disconnected) -->
+        <Storyboard x:Key="PulseRed" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="RiotStatusDot"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.3" Duration="0:0:0.9"
+                             AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Modern Dark ContextMenu Style -->
+        <Style x:Key="ModernContextMenu" TargetType="{x:Type ContextMenu}">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Grid.IsSharedSizeScope" Value="True" />
+            <Setter Property="HasDropShadow" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContextMenu}">
+                        <Border Background="#131929"
+                                BorderBrush="#293552"
+                                BorderThickness="1.2"
+                                CornerRadius="10"
+                                Padding="5,5">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="16" Direction="270" ShadowDepth="4" Color="Black" Opacity="0.55" />
+                            </Border.Effect>
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Dark MenuItem Style -->
+        <Style x:Key="ModernMenuItem" TargetType="{x:Type MenuItem}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border x:Name="MenuItemBorder"
+                                Background="Transparent"
+                                CornerRadius="6"
+                                Padding="12,8"
+                                Margin="1,1">
+                            <ContentPresenter ContentSource="Header"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="#222e4d" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Dark Separator Style -->
+        <Style x:Key="ModernMenuSeparator" TargetType="{x:Type Separator}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Separator}">
+                        <Border Height="1" Background="#24304c" Margin="6,4" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Dark ComboBox ToggleButton Template -->
+        <ControlTemplate x:Key="SortComboBoxToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
+            <Border x:Name="Border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="28" />
+                    </Grid.ColumnDefinitions>
+                    <Path x:Name="Arrow"
+                          Grid.Column="1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="M0,0 L4,4 L8,0"
+                          Stroke="#94a3b8"
+                          StrokeThickness="1.5"
+                          Fill="Transparent" />
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#38bdf8" />
+                    <Setter TargetName="Border" Property="Background" Value="#1c243a" />
+                    <Setter TargetName="Arrow" Property="Stroke" Value="#38bdf8" />
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#38bdf8" />
+                    <Setter TargetName="Arrow" Property="Stroke" Value="#38bdf8" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Modern Dark ComboBoxItem Style -->
+        <Style TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Foreground" Value="#cbd5e1" />
+            <Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="ItemBorder"
+                                Background="Transparent"
+                                CornerRadius="8"
+                                Padding="10,8"
+                                Margin="2,2">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#1e293b" />
+                                <Setter Property="Foreground" Value="#38bdf8" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#1e2942" />
+                                <Setter Property="Foreground" Value="#38bdf8" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Dark ComboBox Style -->
+        <Style x:Key="SortComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+            <Setter Property="Foreground" Value="#f8fafc" />
+            <Setter Property="Background" Value="#161c2e" />
+            <Setter Property="BorderBrush" Value="#2e3b5e" />
+            <Setter Property="BorderThickness" Value="1.2" />
+            <Setter Property="FontFamily" Value="{StaticResource Nunito}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Template="{StaticResource SortComboBoxToggleButtonTemplate}" />
+                            <ContentPresenter x:Name="ContentSite"
+                                              Margin="12,0,30,0"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              IsHitTestVisible="False">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#f8fafc" />
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade">
+                                <Grid x:Name="DropDown"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                      SnapsToDevicePixels="True"
+                                      Margin="0,4,0,8">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="#121727"
+                                            BorderBrush="#2e3b5e"
+                                            BorderThickness="1.5"
+                                            CornerRadius="10">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="14" ShadowDepth="4" Color="Black" Opacity="0.6" />
+                                        </Border.Effect>
+                                        <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="False">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="60" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#64748b" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <!-- Dark Blur Backdrop -->
+    <Grid Background="#B0000000" MouseLeftButtonUp="Backdrop_Click">
+        <!-- Main Directory Window Container -->
+        <Border Margin="16,10" Padding="16,14" CornerRadius="18"
+                BorderThickness="1.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                MouseLeftButtonUp="InnerBorder_Click">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#121626" Offset="0" />
+                    <GradientStop Color="#0c0f1c" Offset="0.6" />
+                    <GradientStop Color="#080a13" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#2f3b60" Offset="0" />
+                    <GradientStop Color="#4f46e5" Offset="0.5" />
+                    <GradientStop Color="#2f3b60" Offset="1" />
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Row 0: Header & Stats -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Row 1: Tab Navigation & Search & Sort -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Row 2: Player Cards Content -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- ROW 0: TOP HEADER BAR -->
+                <Grid Grid.Row="0" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title & Subtitle with Modern Glowing Badge -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="48" Height="48" CornerRadius="14" Margin="0,0,12,0"
+                                Background="#1a233b" BorderBrush="#00d2ff" BorderThickness="1.5">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="12" Color="#00d2ff" Opacity="0.4" ShadowDepth="0" />
+                            </Border.Effect>
+                            <fa:ImageAwesome Icon="Solid_Users" PrimaryColor="#00d2ff" Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock x:Name="PlayerDirectoryTitleText" Text="OYUNCU REHBERİ &amp; LİSTESİ"
+                                           FontFamily="{StaticResource Nunito}" FontSize="22" FontWeight="ExtraBold"
+                                           Foreground="White" VerticalAlignment="Center" />
+                                <Border x:Name="RiotStatusBadge" Background="#112b23" CornerRadius="8" Padding="10,4" Margin="10,0,0,0"
+                                        BorderBrush="#22c55e" BorderThickness="1.2" VerticalAlignment="Center"
+                                        ToolTip="Riot Client bağlantı durumu. Bağlıyken gizli isimler otomatik çözümlenir.">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse x:Name="RiotStatusDot" Width="8" Height="8" Fill="#22c55e" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="RiotStatusText" Text="Riot Client Bağlı" FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                   FontWeight="Bold" Foreground="#4ade80" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock x:Name="PlayerDirectorySubText" Text="Önceden karşılaştığın oyuncular, kız oyuncu etiketleri ve kişisel oyuncu notların"
+                                       FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Header Quick Stat Badges -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Total Players Pill -->
+                        <Border Background="#161c2e" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
+                                BorderBrush="#2e3b5e" BorderThickness="1.2">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_Users" PrimaryColor="#8e9bb5" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatTotalLabel" Text="Toplam: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatTotalText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Female Players Pill -->
+                        <Border Background="#2a1224" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
+                                BorderBrush="#ff4b82" BorderThickness="1.2">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Color="#ff4b82" Opacity="0.3" ShadowDepth="0" />
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_Venus" PrimaryColor="#ff4b82" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatFemaleLabel" Text="Kız Oyuncu: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#ff8cb1" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatFemaleText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ff4b82" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Male Players Pill -->
+                        <Border Background="#102038" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
+                                BorderBrush="#38bdf8" BorderThickness="1.2">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Color="#38bdf8" Opacity="0.3" ShadowDepth="0" />
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_Mars" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatMaleLabel" Text="Erkek Oyuncu: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#7dd3fc" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatMaleText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Noted Players Pill -->
+                        <Border Background="#261c0d" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
+                                BorderBrush="#f59e0b" BorderThickness="1.2">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Color="#f59e0b" Opacity="0.3" ShadowDepth="0" />
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#f59e0b" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatNotedLabel" Text="Notlu: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#fcd34d" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatNotedText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#f59e0b" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Encountered Players Pill -->
+                        <Border Background="#0d2436" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
+                                BorderBrush="#00d2ff" BorderThickness="1.2">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Color="#00d2ff" Opacity="0.3" ShadowDepth="0" />
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_Rotate" PrimaryColor="#00d2ff" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatEncounterLabel" Text="Denk Gelinen: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#7dd3fc" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatEncounterText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#00d2ff" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Blacklisted Players Pill -->
+                        <Border Background="#2b1418" CornerRadius="10" Padding="12,6"
+                                BorderBrush="#ef4444" BorderThickness="1.2">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Color="#ef4444" Opacity="0.3" ShadowDepth="0" />
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="#ef4444" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatBlacklistLabel" Text="Engelli: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#fca5a5" VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatBlacklistText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ef4444" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Close Button (✕ KAPAT) -->
+                    <Button Grid.Column="2" Click="Close_Click"
+                            Background="#221721" BorderBrush="#e55b5b" BorderThickness="1.5"
+                            Cursor="Hand" Height="42" Padding="18,0" VerticalAlignment="Center">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="10" />
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="✕" FontSize="16" FontWeight="Bold" Foreground="#e55b5b" Margin="0,0,8,0" />
+                            <TextBlock x:Name="CloseEscText" Text="KAPAT (ESC)" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- ROW 1: TABS + SEARCH BAR + SORT SELECTOR -->
+                <Border Grid.Row="1" Background="#111626" CornerRadius="14" Padding="8,6" Margin="0,0,0,12"
+                        BorderBrush="#232d47" BorderThickness="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <!-- Tab buttons -->
+                            <ColumnDefinition Width="Auto" />
+                            <!-- Spacer / Search Bar -->
+                            <ColumnDefinition Width="*" />
+                            <!-- Sort selector -->
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- FILTER TABS (Sekmeler) -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- TAB 1: KIZ OYUNCULAR -->
+                            <Border x:Name="TabFemaleBorder"
+                                    Background="#2e1226" BorderBrush="#ff4b82" BorderThickness="1.5"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabFemale_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_Venus" PrimaryColor="#ff4b82" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabFemaleTitle" Text="Kız Oyuncular"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ff8cb1" />
+                                    <Border Background="#451838" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabFemaleBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#ff4b82" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TAB 2: ERKEK OYUNCULAR -->
+                            <Border x:Name="TabMaleBorder"
+                                    Background="#161c2e" BorderBrush="#2e3b5e" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabMale_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_Mars" PrimaryColor="#38bdf8" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabMaleTitle" Text="Erkek Oyuncular"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="SemiBold" Foreground="#8e9bb5" />
+                                    <Border Background="#1e2c45" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabMaleBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#8e9bb5" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TAB 3: NOT EKLENENLER -->
+                            <Border x:Name="TabNotedBorder"
+                                    Background="#161c2e" BorderBrush="#2e3b5e" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabNoted_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#f59e0b" Width="13" Height="13" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabNotedTitle" Text="Not Eklediklerin"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="SemiBold" Foreground="#8e9bb5" />
+                                    <Border Background="#22283a" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabNotedBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#8e9bb5" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TAB 4: ÖNCEDEN DENK GELİNENLER -->
+                            <Border x:Name="TabEncounterBorder"
+                                    Background="#161c2e" BorderBrush="#2e3b5e" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabEncounter_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_Users" PrimaryColor="#00d2ff" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabEncounterTitle" Text="Önceden Denk Geldiklerin"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="SemiBold" Foreground="#8e9bb5" />
+                                    <Border Background="#22283a" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabEncounterBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#8e9bb5" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TAB 5: ENGELLEDİKLERİN -->
+                            <Border x:Name="TabBlacklistBorder"
+                                    Background="#161c2e" BorderBrush="#2e3b5e" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabBlacklist_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="#ef4444" Width="13" Height="13" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabBlacklistTitle" Text="Engellediklerin"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="SemiBold" Foreground="#8e9bb5" />
+                                    <Border Background="#22283a" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabBlacklistBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#8e9bb5" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TAB 6: TÜMÜ -->
+                            <Border x:Name="TabAllBorder"
+                                    Background="#161c2e" BorderBrush="#2e3b5e" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,0,6,0" Padding="14,8"
+                                    Cursor="Hand" MouseLeftButtonUp="TabAll_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Solid_Star" PrimaryColor="#ffd700" Width="13" Height="13" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TabAllTitle" Text="Tümü"
+                                               FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="SemiBold" Foreground="#8e9bb5" />
+                                    <Border Background="#22283a" CornerRadius="8" Padding="6,1" Margin="8,0,0,0">
+                                         <TextBlock x:Name="TabAllBadge" Text="0" FontFamily="{StaticResource Nunito}"
+                                                    FontSize="11" FontWeight="Bold" Foreground="#8e9bb5" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- SEARCH BOX -->
+                        <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#171e33" CornerRadius="10" BorderBrush="#2d3858" BorderThickness="1.2"
+                                Width="320" Height="38" Padding="10,0" Margin="10,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <fa:ImageAwesome Grid.Column="0" Icon="Solid_MagnifyingGlass" PrimaryColor="#64748b" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <TextBox Grid.Column="1" x:Name="SearchTextBox"
+                                         TextChanged="SearchTextBox_TextChanged"
+                                         Background="Transparent" BorderThickness="0"
+                                         FontFamily="{StaticResource Nunito}" FontSize="13"
+                                         Foreground="White" VerticalAlignment="Center"
+                                         CaretBrush="#38bdf8" />
+                                <TextBlock Grid.Column="1" x:Name="SearchPlaceholder"
+                                           Text="Oyuncu adı veya notlarda ara..."
+                                           FontFamily="{StaticResource Nunito}" FontSize="13"
+                                           Foreground="#64748b" VerticalAlignment="Center"
+                                           IsHitTestVisible="False" />
+                                <Button Grid.Column="2" x:Name="ClearSearchBtn" Click="ClearSearch_Click"
+                                        Content="✕" Foreground="#94a3b8" Background="Transparent"
+                                        BorderThickness="0" Cursor="Hand" FontSize="12"
+                                        Visibility="Collapsed" VerticalAlignment="Center" Margin="4,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <!-- SORT SELECTOR -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="SortLabel" Text="Sıralama: " FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox x:Name="SortComboBox" SelectionChanged="SortComboBox_SelectionChanged"
+                                      Width="160" Height="36"
+                                      Style="{StaticResource SortComboBoxStyle}">
+                                <ComboBoxItem x:Name="SortItemRecent" Content="En Son Görülen" IsSelected="True" />
+                                <ComboBoxItem x:Name="SortItemCount" Content="En Çok Karşılaşılan" />
+                                <ComboBoxItem x:Name="SortItemName" Content="İsim (A-Z)" />
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ROW 2: MAIN CONTENT (PLAYER CARDS OR EMPTY STATE) -->
+                <Grid Grid.Row="2">
+                    <!-- Scrollable Cards Grid with Lazy Loading / Infinite Scroll -->
+                    <ScrollViewer x:Name="CardsScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  ScrollChanged="CardsScrollViewer_ScrollChanged">
+                        <StackPanel Margin="0,0,0,30">
+                            <ItemsControl x:Name="PlayersItemsControl">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <!-- INDIVIDUAL MODERN PLAYER CARD -->
+                                        <Border Width="430" MinHeight="185" Margin="7,7" CornerRadius="14" Padding="12"
+                                                Background="{Binding CardBackground}" BorderThickness="1.5"
+                                                BorderBrush="{Binding CardBorderBrush}">
+                                            <Border.Style>
+                                                <Style TargetType="{x:Type Border}">
+                                                    <Setter Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect BlurRadius="8" Direction="270" ShadowDepth="2" Opacity="0.12" Color="#000000" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Effect">
+                                                                <Setter.Value>
+                                                                    <DropShadowEffect BlurRadius="16" Direction="270" ShadowDepth="3" Opacity="0.35" Color="#000000" />
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                            <Grid.RowDefinitions>
+                                                <!-- Row 0: Avatar, Username, Badges -->
+                                                <RowDefinition Height="Auto" />
+                                                <!-- Row 1: Encounter Stats & Last Activity -->
+                                                <RowDefinition Height="Auto" />
+                                                <!-- Row 2: Note Box or Inline Editor -->
+                                                <RowDefinition Height="Auto" />
+                                                <!-- Row 3: Action Buttons (Female Toggle, Blacklist, Matches) -->
+                                                <RowDefinition Height="Auto" />
+                                                <!-- Row 4: Expandable Match History -->
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- CARD ROW 0: AVATAR + USERNAME + STATUS BADGES -->
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Avatar / Agent Icon -->
+                                                <Border Grid.Column="0" Width="52" Height="52" CornerRadius="26"
+                                                        Background="#1e2740" BorderThickness="1.5" Margin="0,0,10,0"
+                                                        BorderBrush="{Binding CardBorderBrush}">
+                                                    <Grid>
+                                                        <!-- Agent Image if available (perfectly clipped to circular frame) -->
+                                                        <Grid Width="49" Height="49" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              Visibility="{Binding HasAgentIconVisibility}">
+                                                            <Grid.Clip>
+                                                                <EllipseGeometry Center="24.5,24.5" RadiusX="24.5" RadiusY="24.5" />
+                                                            </Grid.Clip>
+                                                            <Image Source="{Binding LastSeenAgentIcon}" Stretch="UniformToFill"
+                                                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                                                        </Grid>
+                                                        <!-- Fallback Avatar Text / Icon -->
+                                                        <TextBlock Text="{Binding InitialLetter}"
+                                                                   FontFamily="{StaticResource Nunito}" FontSize="20" FontWeight="Bold"
+                                                                   Foreground="#38bdf8" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   Visibility="{Binding NoAgentIconVisibility}" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Username & Quick Copy Button -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding DisplayName}"
+                                                                   FontFamily="{StaticResource Nunito}" FontSize="15" FontWeight="Bold"
+                                                                   Foreground="White" MaxWidth="230" TextTrimming="CharacterEllipsis"
+                                                                   ToolTip="{Binding DisplayName}"
+                                                                   VerticalAlignment="Center" />
+                                                        <!-- Copy Username Button -->
+                                                        <Button Tag="{Binding}" Click="CardCopyUsername_Click"
+                                                                Margin="6,0,0,0" Padding="5,2" Height="24"
+                                                                Background="#1e263d" BorderBrush="#3c476d" BorderThickness="1"
+                                                                Cursor="Hand" ToolTip="{Binding CopyUsernameTooltip}" VerticalAlignment="Center">
+                                                            <Button.Resources>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="CornerRadius" Value="5" />
+                                                                </Style>
+                                                            </Button.Resources>
+                                                            <fa:ImageAwesome Icon="Solid_Copy" PrimaryColor="#94a3b8" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Button>
+                                                    </StackPanel>
+
+                                                    <!-- Subtext: PUUID or Status -->
+                                                    <TextBlock Text="{Binding PuuidShort}" FontFamily="{StaticResource Nunito}"
+                                                                FontSize="10.5" Foreground="#64748b" Margin="0,2,0,0" />
+                                                </StackPanel>
+
+                                                <!-- Top Right Badges (Female pill, Encounter pill, Blacklist pill) -->
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Female Pill Badge -->
+                                                    <Border Visibility="{Binding FemaleBadgeVisibility}"
+                                                            Background="#2e1124" BorderBrush="#ff4b82" BorderThickness="1"
+                                                            CornerRadius="8" Padding="7,3" Margin="0,0,4,0">
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <fa:ImageAwesome Icon="Solid_Venus" PrimaryColor="#ff4b82" Width="10" Height="10" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding FemaleBadgeText}" FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                                       FontWeight="Bold" Foreground="#ff4b82" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Male Pill Badge -->
+                                                    <Border Visibility="{Binding MaleBadgeVisibility}"
+                                                            Background="#102038" BorderBrush="#38bdf8" BorderThickness="1"
+                                                            CornerRadius="8" Padding="7,3" Margin="0,0,4,0">
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <fa:ImageAwesome Icon="Solid_Mars" PrimaryColor="#38bdf8" Width="10" Height="10" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding MaleBadgeText}" FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                                       FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Encounter Count Pill Badge -->
+                                                    <Border Visibility="{Binding EncounterBadgeVisibility}"
+                                                            Background="#0d2436" BorderBrush="#00d2ff" BorderThickness="1"
+                                                            CornerRadius="8" Padding="7,3" Margin="0,0,4,0"
+                                                            ToolTip="{Binding EncounterBreakdown}">
+                                                        <TextBlock Text="{Binding TotalEncountersText}" FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                                   FontWeight="Bold" Foreground="#00d2ff" />
+                                                    </Border>
+
+                                                    <!-- Blacklist Pill Badge -->
+                                                    <Border Visibility="{Binding BlacklistBadgeVisibility}"
+                                                            Background="#331414" BorderBrush="#e55b5b" BorderThickness="1"
+                                                            CornerRadius="8" Padding="6,3">
+                                                        <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="#ef4444" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+
+                                                    <!-- Delete / Manage Data Menu Button -->
+                                                    <Button Tag="{Binding}" Click="CardDeleteMenu_Click"
+                                                            Margin="5,0,0,0" Padding="4,2" Height="22" Width="24"
+                                                            Background="#1a1c29" BorderBrush="#475569" BorderThickness="1"
+                                                            Cursor="Hand" ToolTip="{Binding DeleteMenuTooltip}" VerticalAlignment="Center">
+                                                        <Button.Resources>
+                                                            <Style TargetType="{x:Type Border}">
+                                                                <Setter Property="CornerRadius" Value="6" />
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <fa:ImageAwesome Icon="Solid_TrashCan" PrimaryColor="#ef4444" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <!-- CARD ROW 1: ENCOUNTER STATS & LAST SEEN -->
+                                            <Border Grid.Row="1" Background="#0f1424" CornerRadius="8" Padding="10,6" Margin="0,8,0,6"
+                                                    BorderBrush="#1d263d" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Ally vs Enemy Breakdown -->
+                                                    <TextBlock Grid.Column="0" Text="{Binding EncounterBreakdown}"
+                                                               FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                               Foreground="#94a3b8" VerticalAlignment="Center" Margin="0,0,8,0" />
+
+                                                    <!-- Last Seen Activity Info (Clean Right-Aligned with Ellipsis & Tooltip) -->
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                                ToolTip="{Binding LastSeenFullTooltip}">
+                                                        <fa:ImageAwesome Icon="Solid_Clock" PrimaryColor="#64748b" Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding LastSeenSummary}"
+                                                                   FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                                   Foreground="#38bdf8" VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis" MaxWidth="210" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- CARD ROW 2: NOTE DISPLAY OR INLINE NOTE EDITOR -->
+                                            <Grid Grid.Row="2" Margin="0,0,0,8">
+                                                <!-- DISPLAY NOTE (When not editing) -->
+                                                <Border Visibility="{Binding DisplayNoteVisibility}">
+                                                    <Grid>
+                                                        <!-- Note exists: Show stylized quote box -->
+                                                        <Border Visibility="{Binding HasNoteVisibility}"
+                                                                Background="#1f1a10" CornerRadius="8" Padding="10,6"
+                                                                BorderBrush="#f59e0b" BorderThickness="1">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <Grid Grid.Column="0" Margin="0,0,6,0">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <fa:ImageAwesome Grid.Column="0" Icon="Solid_PenToSquare" PrimaryColor="#f59e0b" Width="11" Height="11" VerticalAlignment="Top" Margin="0,2,5,0" />
+                                                                    <TextBlock Grid.Column="1" Text="{Binding Note}"
+                                                                               FontFamily="{StaticResource Nunito}" FontSize="12"
+                                                                               FontStyle="Italic" Foreground="#fcd34d"
+                                                                               TextWrapping="Wrap" MaxHeight="52" TextTrimming="CharacterEllipsis"
+                                                                               ToolTip="{Binding Note}" VerticalAlignment="Center" />
+                                                                </Grid>
+                                                                <Button Grid.Column="1" Tag="{Binding}" Click="CardEditNote_Click"
+                                                                        Padding="6,2" Height="22" Background="#2e2412" BorderBrush="#f59e0b"
+                                                                        BorderThickness="1" Cursor="Hand"
+                                                                        VerticalAlignment="Center">
+                                                                    <Button.Resources>
+                                                                        <Style TargetType="Border">
+                                                                            <Setter Property="CornerRadius" Value="4" />
+                                                                        </Style>
+                                                                    </Button.Resources>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Pen" PrimaryColor="#fcd34d" Width="9" Height="9" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="Düzenle" FontFamily="{StaticResource Nunito}" FontSize="10" Foreground="#fcd34d" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                            </Grid>
+                                                        </Border>
+
+                                                        <!-- No note yet: Subtle "+ Not Ekle" link -->
+                                                        <Border Visibility="{Binding NoNoteVisibility}" HorizontalAlignment="Left">
+                                                            <Button Tag="{Binding}" Click="CardEditNote_Click"
+                                                                    Background="Transparent" BorderBrush="#2e3852" BorderThickness="1"
+                                                                    Cursor="Hand" Padding="8,3" Height="24">
+                                                                <Button.Resources>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="CornerRadius" Value="6" />
+                                                                    </Style>
+                                                                </Button.Resources>
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="＋ " FontSize="11" Foreground="#64748b" />
+                                                                    <TextBlock Text="{Binding AddNoteText}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#8e9bb5" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- INLINE NOTE EDITOR (When IsEditingNote == true) -->
+                                                <Border Visibility="{Binding EditNoteVisibility}"
+                                                        Background="#101524" CornerRadius="8" Padding="8"
+                                                        BorderBrush="#f59e0b" BorderThickness="1.5">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding EditNoteHeader}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" FontWeight="Bold" Foreground="#fcd34d" Margin="0,0,0,4" />
+                                                        <TextBox Text="{Binding EditNoteText, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Background="#171e33" BorderBrush="#2d3858" BorderThickness="1"
+                                                                 Foreground="White" FontFamily="{StaticResource Nunito}" FontSize="12"
+                                                                 Padding="6,4" Height="48" TextWrapping="Wrap" MaxLength="250"
+                                                                 CaretBrush="#f59e0b" />
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
+                                                            <Button Tag="{Binding}" Click="CardSaveNote_Click"
+                                                                    Background="#153629" BorderBrush="#32e2b2" BorderThickness="1"
+                                                                    Cursor="Hand" Padding="10,3" Height="24" Margin="0,0,6,0">
+                                                                <Button.Resources>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="CornerRadius" Value="5" />
+                                                                    </Style>
+                                                                </Button.Resources>
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <fa:ImageAwesome Icon="Solid_FloppyDisk" PrimaryColor="#32e2b2" Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding SaveNoteText}" FontFamily="{StaticResource Nunito}" FontSize="11" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <Button Tag="{Binding}" Click="CardDeleteNote_Click"
+                                                                    Visibility="{Binding HasNoteVisibility}"
+                                                                    Background="#2b1414" BorderBrush="#e55b5b" BorderThickness="1"
+                                                                    Cursor="Hand" Padding="8,3" Height="24" Margin="0,0,6,0">
+                                                                <Button.Resources>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="CornerRadius" Value="5" />
+                                                                    </Style>
+                                                                </Button.Resources>
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <fa:ImageAwesome Icon="Solid_TrashCan" PrimaryColor="#e55b5b" Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding DeleteNoteText}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#e55b5b" VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <Button Tag="{Binding}" Click="CardCancelNote_Click"
+                                                                    Background="#1c2336" BorderBrush="#3c476d" BorderThickness="1"
+                                                                    Cursor="Hand" Padding="8,3" Height="24">
+                                                                <Button.Resources>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="CornerRadius" Value="5" />
+                                                                    </Style>
+                                                                </Button.Resources>
+                                                                <TextBlock Text="{Binding CancelNoteText}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#94a3b8" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- CARD ROW 3: QUICK ACTIONS BAR (Female toggle, Male toggle, Blacklist toggle, Matches toggle) -->
+                                            <Grid Grid.Row="3" Margin="0,2,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Female Toggle Button -->
+                                                    <Button Tag="{Binding}" Click="CardToggleFemale_Click"
+                                                            Background="{Binding FemaleActionBg}" BorderBrush="{Binding FemaleActionBorder}"
+                                                            BorderThickness="1" Cursor="Hand" Padding="10,4" Height="28" Margin="0,0,6,0"
+                                                            ToolTip="{Binding FemaleToggleTooltip}">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="6" />
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding FemaleToggleText}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="11" FontWeight="Bold" Foreground="{Binding FemaleToggleColor}" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Male Toggle Button -->
+                                                    <Button Tag="{Binding}" Click="CardToggleMale_Click"
+                                                            Background="{Binding MaleActionBg}" BorderBrush="{Binding MaleActionBorder}"
+                                                            BorderThickness="1" Cursor="Hand" Padding="10,4" Height="28" Margin="0,0,6,0"
+                                                            ToolTip="{Binding MaleToggleTooltip}">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="6" />
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding MaleToggleText}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="11" FontWeight="Bold" Foreground="{Binding MaleToggleColor}" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Blacklist Toggle Button -->
+                                                    <Button Tag="{Binding}" Click="CardToggleBlacklist_Click"
+                                                            Background="{Binding BlacklistActionBg}" BorderBrush="{Binding BlacklistActionBorder}" BorderThickness="1"
+                                                            Cursor="Hand" Padding="8,4" Height="28"
+                                                            ToolTip="{Binding BlacklistToggleText}">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="6" />
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="#ef4444" Width="10" Height="10" Margin="0,0,4,0" VerticalAlignment="Center"
+                                                                             Visibility="{Binding IsBlacklisted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                            <TextBlock Text="{Binding BlacklistToggleText}" FontFamily="{StaticResource Nunito}"
+                                                                       FontSize="11" FontWeight="Bold" Foreground="{Binding BlacklistToggleColor}" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+
+                                                <!-- Match History Expander Button -->
+                                                <Button Grid.Column="1" Tag="{Binding}" Click="CardToggleMatches_Click"
+                                                        Visibility="{Binding HasMatchesVisibility}"
+                                                        Background="#151d33" BorderBrush="#2e3d66" BorderThickness="1"
+                                                        Cursor="Hand" Padding="8,4" Height="28">
+                                                    <Button.Resources>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="CornerRadius" Value="6" />
+                                                        </Style>
+                                                    </Button.Resources>
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding MatchesButtonText}" FontFamily="{StaticResource Nunito}"
+                                                                   FontSize="11" Foreground="#38bdf8" />
+                                                        <TextBlock Text="{Binding MatchesToggleIcon}" FontSize="9" Foreground="#38bdf8" Margin="4,0,0,0" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+
+                                            <!-- CARD ROW 4: EXPANDABLE MATCH HISTORY -->
+                                            <Border Grid.Row="4" Visibility="{Binding MatchesVisibility}"
+                                                    Background="#0c101c" CornerRadius="8" Padding="8" Margin="0,8,0,0"
+                                                    BorderBrush="#1e2740" BorderThickness="1">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding MatchesHeader}" FontFamily="{StaticResource Nunito}"
+                                                               FontSize="11" FontWeight="Bold" Foreground="#38bdf8" Margin="0,0,0,6" />
+                                                    <ItemsControl ItemsSource="{Binding Matches}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Background="#141a2c" CornerRadius="6" Padding="6,4" Margin="0,0,0,4">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <!-- Ally / Enemy Indicator -->
+                                                                        <TextBlock Grid.Column="0" Text="{Binding TeamText}"
+                                                                                   FontFamily="{StaticResource Nunito}" FontSize="11"
+                                                                                   FontWeight="Bold" Foreground="{Binding TeamColor}" Margin="0,0,8,0" />
+                                                                        <!-- Map & Agent -->
+                                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding Map}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="White" />
+                                                                            <TextBlock Text=" • " Foreground="#64748b" FontSize="11" />
+                                                                            <TextBlock Text="{Binding AgentName}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#38bdf8" />
+                                                                        </StackPanel>
+                                                                        <!-- Date -->
+                                                                        <TextBlock Grid.Column="2" Text="{Binding Date}" FontFamily="{StaticResource Nunito}"
+                                                                                   FontSize="10.5" Foreground="#64748b" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- PAGING / LAZY LOAD FOOTER -->
+                        <Border x:Name="PagingFooterBorder" Padding="14,16" Margin="0,10,0,50" Visibility="Collapsed">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock x:Name="PagingStatusText" Text="0 / 0 oyuncu gösteriliyor"
+                                           FontFamily="{StaticResource Nunito}" FontSize="12.5"
+                                           Foreground="#8e9bb5" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button x:Name="LoadMoreBtn" Click="LoadMoreBtn_Click"
+                                            Background="#1a2540" BorderBrush="#38bdf8" BorderThickness="1.2"
+                                            Padding="18,7" Margin="0,0,10,0" Cursor="Hand">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="8" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <fa:ImageAwesome Icon="Solid_Plus" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="LoadMoreBtnText" Text="Daha Fazla Yükle (+30)" FontFamily="{StaticResource Nunito}"
+                                                       FontSize="12" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button x:Name="LoadAllBtn" Click="LoadAllBtn_Click"
+                                            Background="#141928" BorderBrush="#2e3a5a" BorderThickness="1"
+                                            Padding="14,7" Cursor="Hand">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="8" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock x:Name="LoadAllBtnText" Text="Tümünü Göster" FontFamily="{StaticResource Nunito}"
+                                                   FontSize="11.5" Foreground="#94a3b8" />
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                    <!-- EMPTY STATE (No players in active tab or search) -->
+                    <Border x:Name="EmptyStateBorder" Visibility="Collapsed"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="30">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Border Width="72" Height="72" CornerRadius="36" Background="#161d30"
+                                    BorderBrush="#2d3858" BorderThickness="2" HorizontalAlignment="Center" Margin="0,0,0,16">
+                                <fa:ImageAwesome x:Name="EmptyStateIcon" Icon="Solid_MagnifyingGlass" PrimaryColor="#38bdf8" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock x:Name="EmptyStateTitle" Text="Kayıtlı Oyuncu Bulunamadı"
+                                       FontFamily="{StaticResource Nunito}" FontSize="18" FontWeight="Bold"
+                                       Foreground="White" HorizontalAlignment="Center" />
+                            <TextBlock x:Name="EmptyStateDesc" Text="Bu kategoride veya arama kriterinde henüz bir oyuncu kaydı yok."
+                                       FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5"
+                                       HorizontalAlignment="Center" TextAlignment="Center" Margin="0,6,0,18" MaxWidth="440" LineHeight="20" />
+                            <Border Background="#1b243d" CornerRadius="10" Padding="14,8" HorizontalAlignment="Center"
+                                    BorderBrush="#38bdf8" BorderThickness="1">
+                                <TextBlock x:Name="EmptyStateTip"
+                                           Text="İpucu: Maç ekranındaki oyuncu kartlarında ♀ butonuna basarak kız oyuncuları, kalem simgesine basarak notları kaydedebilirsin."
+                                           FontFamily="{StaticResource Nunito}" FontSize="11.5" Foreground="#38bdf8" TextAlignment="Center" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
+

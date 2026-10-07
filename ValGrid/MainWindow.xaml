@@ -1,0 +1,23 @@
+<Window
+	x:Class="ValGrid.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:ValGrid="clr-namespace:ValGrid"
+	xmlns:viewModels="clr-namespace:ValGrid.ViewModels"
+	Title="ValGrid"
+	Icon="Assets/logo.ico"
+	d:DesignHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}"
+	d:DesignWidth="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}"
+	d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel}"
+	Background="#2E3349"
+	UseLayoutRounding="True"
+	Width="2492"
+	Height="1111"
+	MaxWidth="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}"
+	MaxHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}"
+	WindowStartupLocation="CenterScreen"
+	mc:Ignorable="d">
+	<ValGrid:ViewModelPresenter ViewModel="{Binding SelectedViewModel}" />
+</Window>

@@ -1,0 +1,67 @@
+name: Build and release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          ref: ${{ env.TAG }}
+      - name: Setup .NET Core SDK 6.0.400
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.400
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: >
+          dotnet publish .\ValGrid\ValGrid.csproj
+          --configuration Release
+          -p:PublishSingleFile=true
+          --self-contained false -r win-x64
+          -o ./inno
+      - name: Download netcorecheck
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -URI https://go.microsoft.com/fwlink/?linkid=2135256 -OutFile .\inno\netcorecheck.exe
+          Invoke-WebRequest -URI https://go.microsoft.com/fwlink/?linkid=2135504 -OutFile .\inno\netcorecheck_x64.exe
+      - name: Download InnoSetup
+        uses: pwall2222/inno-setup-download@v0.0.8
+      - name: Package application
+        run: ISCC.exe ./ValGrid.iss
+      - name: Rename installer
+        shell: pwsh
+        run: |
+          Rename-Item ./inno/out/ValGrid.exe ValGrid_Setup.exe
+      - name: Get CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1.8.1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ env.TAG }}
+          writeToFile: false
+          excludeTypes: chore,ci,build,docs,style
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./inno/out/ValGrid_Setup.exe
+            ./inno/ValGrid.exe
+          tag_name: ${{ env.TAG }}
+          body: |
+            ![Release downloads](https://img.shields.io/github/downloads/valgrid/ValGrid/${{ env.TAG }}/total)
+            ${{ steps.changelog.outputs.changes }}

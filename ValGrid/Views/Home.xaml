@@ -1,0 +1,337 @@
+<UserControl
+	x:Class="ValGrid.Views.Home"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:c="clr-namespace:ValGrid.Controls"
+	xmlns:viewmodels="clr-namespace:ValGrid.ViewModels"
+	xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+	xmlns:p="clr-namespace:ValGrid.Properties"
+	xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+	d:DataContext="{d:DesignInstance Type=viewmodels:HomeViewModel}"
+	d:DesignHeight="754"
+	d:DesignWidth="1536"
+	mc:Ignorable="d">
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Loaded">
+			<i:InvokeCommandAction Command="{Binding PassiveLoadCheckCommand}" />
+		</i:EventTrigger>
+		<i:EventTrigger EventName="Unloaded">
+			<i:InvokeCommandAction Command="{Binding UnloadViewCommand}" />
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</UserControl.Resources>
+	<UserControl.Triggers>
+		<EventTrigger RoutedEvent="Loaded">
+			<BeginStoryboard>
+				<Storyboard>
+					<DoubleAnimation
+						Storyboard.TargetProperty="Opacity"
+						From="0.0" To="1.0" Duration="0:0:1" />
+				</Storyboard>
+			</BeginStoryboard>
+		</EventTrigger>
+	</UserControl.Triggers>
+
+	<Grid Margin="15">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="60" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+
+		<Grid Grid.Row="0" Grid.ColumnSpan="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Button
+				x:Name="SettingsNavBtn"
+				Grid.Column="0" Cursor="Hand" Width="60" Height="60"
+				HorizontalAlignment="Left" VerticalAlignment="Center"
+				Command="{Binding DataContext.NavigateSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+				Template="{StaticResource ButtonTemplate}"
+				ToolTipService.InitialShowDelay="0">
+
+				<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Gear" Margin="10" />
+			</Button>
+			<Button
+				Grid.Column="0" x:Name="GoMatch"
+				Command="{Binding DataContext.NavigateMatchCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+				Visibility="Collapsed" />
+
+			<StackPanel Grid.Row="0" Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+				<!-- Player Directory & List Button -->
+				<Button x:Name="PlayerListNavBtn" Cursor="Hand" Height="50" Margin="0,0,10,0" Padding="14,0"
+				        Click="OpenPlayerList_Click"
+				        Template="{StaticResource ButtonTemplate}"
+				        ToolTipService.InitialShowDelay="0">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Users" PrimaryColor="#32e2b2" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+						<TextBlock x:Name="PlayerListNavText" Text="Liste" FontFamily="{StaticResource Nunito}" FontSize="16" FontWeight="Bold"
+						           Foreground="#32e2b2" VerticalAlignment="Center" />
+					</StackPanel>
+				</Button>
+
+				<Button x:Name="CareerNavBtn" Cursor="Hand" Height="50" Margin="0,0,10,0" Padding="14,0"
+				        Click="OpenCareer_Click"
+				        Template="{StaticResource ButtonTemplate}"
+				        ToolTipService.InitialShowDelay="0">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<fa:ImageAwesome Icon="Solid_Scroll" PrimaryColor="#007EF9" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+						<TextBlock x:Name="CareerNavText" Text="Kariyer" FontFamily="{StaticResource Nunito}" FontSize="16" FontWeight="Bold"
+						           Foreground="#007EF9" VerticalAlignment="Center" />
+					</StackPanel>
+				</Button>
+				<Button x:Name="InfoNavBtn" Cursor="Hand" Width="60" Height="60"
+				        Command="{Binding DataContext.NavigateInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+				        Template="{StaticResource ButtonTemplate}"
+				        ToolTipService.InitialShowDelay="0">
+					<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Info" Margin="10" />
+				</Button>
+			</StackPanel>
+
+			<!-- Top Center Daily Store Button (Günlük Mağaza) -->
+			<Button
+				x:Name="DailyStoreNavBtn"
+				Grid.Row="0" Grid.Column="2" Cursor="Hand" Height="48" Margin="10,0" Padding="18,0"
+				HorizontalAlignment="Center" VerticalAlignment="Center"
+				Click="OpenStore_Click"
+				Template="{StaticResource ButtonTemplate}"
+				Visibility="{Binding StoreButtonVisibility, FallbackValue=Visible}"
+				ToolTipService.InitialShowDelay="0">
+				<Button.Effect>
+					<DropShadowEffect BlurRadius="14" ShadowDepth="2" Color="#ffd700" Opacity="0.35" />
+				</Button.Effect>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<fa:ImageAwesome Icon="Solid_CartShopping" PrimaryColor="#ffd700" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+					<TextBlock x:Name="DailyStoreNavText" Text="Günlük Mağaza" FontFamily="{StaticResource Nunito}" FontSize="15" FontWeight="Bold"
+					           Foreground="#ffd700" VerticalAlignment="Center" />
+				</StackPanel>
+			</Button>
+
+			<TextBlock x:Name="YourPartyTitleText" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="35" VerticalAlignment="Center"
+			           FontWeight="SemiBold" FontFamily="{StaticResource Nunito}"
+			           Foreground="White" Text="GRUBUNUZ" />
+
+			<TextBlock x:Name="StatusTitleText" FontSize="35" VerticalAlignment="Center" HorizontalAlignment="Right"
+			           FontWeight="SemiBold" Grid.Row="0" Grid.Column="3" FontFamily="{StaticResource Nunito}"
+			           Foreground="White" Text="DURUM" />
+		</Grid>
+
+		<ItemsControl Grid.Row="1" Grid.Column="0" Margin="0,15,0,0" VerticalAlignment="Center"
+		              ItemsSource="{Binding PlayerList}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<UniformGrid Columns="1" Margin="5" />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<c:PlayerControl MaxHeight="150"
+					                 Margin="0 5"
+					                 PlayerCell="{Binding}" />
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<!-- Empty Party State Card -->
+		<Border Grid.Row="1" Grid.Column="0" Margin="20" MaxWidth="440" MaxHeight="220"
+		        Background="#252A40" CornerRadius="18" BorderBrush="#343d5a" BorderThickness="1.2"
+		        Visibility="{Binding EmptyPartyVisibility, FallbackValue=Visible}"
+		        HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Border.Effect>
+				<DropShadowEffect BlurRadius="12" ShadowDepth="3" Color="Black" Opacity="0.45" />
+			</Border.Effect>
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24">
+				<fa:ImageAwesome Icon="Solid_Gamepad" PrimaryColor="White" Width="38" Height="38" HorizontalAlignment="Center" Margin="0,0,0,12" />
+				<TextBlock x:Name="EmptyPartyTitleText" Text="Grup Bekleniyor" FontFamily="{StaticResource Nunito}" FontSize="18"
+				           FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" />
+				<TextBlock x:Name="EmptyPartyDescText" Text="Valorant açıkken lobi veya grup üyelerinizin envanterleri burada canlı olarak listelenir."
+				           FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5"
+				           TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0" MaxWidth="320" />
+			</StackPanel>
+		</Border>
+
+
+		<Grid Grid.Row="1" Grid.Column="1" x:Name="Grid">
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+
+			<StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center"
+			            Orientation="Horizontal">
+				<Border Background="#252A40" Margin="20" Width="Auto"
+				        CornerRadius="20">
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition />
+						</Grid.ColumnDefinitions>
+						<TextBlock x:Name="StatusValorantLabel" Margin="25"
+						           FontSize="20"
+						           HorizontalAlignment="Center"
+						           FontFamily="{StaticResource Nunito}"
+						           VerticalAlignment="Center"
+						           FontWeight="Normal"
+						           Foreground="White"
+						           Text="Valorant" />
+						<!-- <Image Margin="25" Width="30" Grid.Row="0" Grid.Column="1" Source="{Binding GameStatus}" /> -->
+						<fa:ImageAwesome Height="30" Width="30" x:Name="ValorantStatusView"
+						                 Grid.Row="0" Grid.Column="1" PrimaryColor="#ff4654"
+						                 Icon="Solid_Xmark" Margin="25" />
+
+						<TextBlock x:Name="StatusAccountLabel" Margin="25" Grid.Row="1" Grid.Column="0"
+						           FontSize="20"
+						           HorizontalAlignment="Center"
+						           VerticalAlignment="Center"
+						           FontFamily="{StaticResource Nunito}"
+						           FontWeight="Normal"
+						           Foreground="White"
+						           Text="Hesap" />
+						<!-- <Image Margin="25" Width="30" Grid.Row="1" Grid.Column="1" Source="{Binding AccountStatus}" /> -->
+						<fa:ImageAwesome Height="30" Width="30" x:Name="AccountStatusView"
+						                 Grid.Row="1" Grid.Column="1" PrimaryColor="#ff4654"
+						                 Icon="Solid_Xmark" Margin="25" />
+						<TextBlock x:Name="StatusMatchLabel" Margin="25" Grid.Row="2" Grid.Column="0"
+						           FontSize="20"
+						           HorizontalAlignment="Center"
+						           VerticalAlignment="Center"
+						           FontFamily="{StaticResource Nunito}"
+						           FontWeight="Normal"
+						           Foreground="White"
+						           Text="Maç" />
+						<!-- <Image Margin="25" Width="30" Grid.Row="2" Grid.Column="1" Source="{Binding MatchStatus}" /> -->
+						<fa:ImageAwesome Height="30" Width="30" x:Name="MatchStatusView"
+						                 Grid.Row="2" Grid.Column="1" PrimaryColor="#ff4654"
+						                 Icon="Solid_Xmark" Margin="25" />
+					</Grid>
+				</Border>
+
+				<Border Background="#252A40" Margin="20" Width="Auto" Height="Auto" VerticalAlignment="Center"
+				        CornerRadius="20">
+					<Border.Effect>
+						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
+					</Border.Effect>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition />
+							<ColumnDefinition />
+						</Grid.ColumnDefinitions>
+						<!-- <TextBlock Margin="25" -->
+						<!--            FontSize="20" -->
+						<!--            HorizontalAlignment="Center" -->
+						<!--            VerticalAlignment="Center" -->
+						<!--            FontFamily="{StaticResource Nunito}" -->
+						<!--            FontWeight="Normal" -->
+						<!--            Foreground="White" -->
+						<!--            Text="{x:Static p:Resources.QueueTime}" /> -->
+						<!-- <TextBlock Margin="25" -->
+						<!--            FontSize="20" Grid.Row="0" Grid.Column="1" -->
+						<!--            HorizontalAlignment="Center" -->
+						<!--            FontFamily="{StaticResource Nunito}" -->
+						<!--            VerticalAlignment="Center" -->
+						<!--            FontWeight="Normal" -->
+						<!--            Foreground="#007EF9" -->
+						<!--            Text="{Binding QueueTime}" /> -->
+						<TextBlock x:Name="RefreshTitleLabel" Margin="25" Grid.Column="0"
+						           FontSize="20" Grid.Row="0"
+						           HorizontalAlignment="Center"
+						           VerticalAlignment="Center"
+						           FontWeight="SemiBold"
+						           Foreground="White"
+						           FontFamily="{StaticResource Nunito}"
+						           Text="Yenile" />
+						<Button
+							Grid.Row="0" Grid.Column="1" Cursor="Hand" Width="60" Height="60" Margin="10"
+							HorizontalAlignment="Left" VerticalAlignment="Center"
+							Template="{StaticResource ButtonTemplate}"
+							Command="{Binding LoadNowCommand}">
+							<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Rotate" Margin="10" />
+						</Button>
+
+						<ToggleButton
+							Grid.Row="0" Grid.Column="2" Cursor="Hand" Width="60" Height="60" Margin="10"
+							HorizontalAlignment="Left" VerticalAlignment="Center"
+							IsChecked="{Binding IsPaused, Mode=TwoWay}"
+							Template="{StaticResource ToggleButtonTemplate}">
+							<i:Interaction.Triggers>
+								<i:EventTrigger EventName="Checked">
+									<i:InvokeCommandAction Command="{Binding Path=StopPassiveLoadAsyncCommand}" />
+								</i:EventTrigger>
+								<i:EventTrigger EventName="Unchecked">
+									<i:InvokeCommandAction Command="{Binding Path=PassiveLoadAsyncCommand}" />
+								</i:EventTrigger>
+							</i:Interaction.Triggers>
+							<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Pause" Margin="10" />
+						</ToggleButton>
+
+						<TextBlock x:Name="RefreshingInLabel" Margin="25" Grid.Row="1" Grid.Column="0"
+						           FontSize="20"
+						           HorizontalAlignment="Center"
+						           VerticalAlignment="Center"
+						           FontWeight="Normal"
+						           Foreground="White"
+						           FontFamily="{StaticResource Nunito}"
+						           Text="Yenileniyor:" />
+						<TextBlock Margin="25" Grid.Row="1" Grid.ColumnSpan="2"
+						           FontSize="20" Grid.Column="1"
+						           HorizontalAlignment="Center"
+						           FontFamily="{StaticResource Nunito}"
+						           VerticalAlignment="Center"
+						           FontWeight="Normal"
+						           Foreground="#007EF9"
+						           Text="{Binding RefreshTime}" />
+					</Grid>
+				</Border>
+			</StackPanel>
+
+
+		</Grid>
+
+		<!-- Loading Overlay -->
+		<c:OverlayControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2"
+		                  Panel.ZIndex="1000"
+		                  Overlay="{Binding Overlay}"
+		                  IsHitTestVisible="{Binding Overlay.IsBusy, FallbackValue=False, TargetNullValue=False}"
+		                  Visibility="{Binding Overlay.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}" />
+
+		<!-- Player Directory & List Full-screen Overlay -->
+		<c:PlayerListControl x:Name="PlayerListOverlay" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2"
+		                     Panel.ZIndex="9998" Visibility="Collapsed" IsHitTestVisible="False" />
+
+		<!-- Career & Match History Full-screen Overlay -->
+		<c:CareerControl x:Name="CareerOverlay" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2"
+		                 Panel.ZIndex="9999" Visibility="Collapsed" IsHitTestVisible="False" />
+
+		<!-- Daily Store (Günlük Mağaza) Full-screen Overlay -->
+		<c:StoreControl x:Name="StoreOverlay" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2"
+		                Panel.ZIndex="10000" Visibility="Collapsed" IsHitTestVisible="False" />
+	</Grid>
+</UserControl>

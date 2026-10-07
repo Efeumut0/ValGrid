@@ -1,0 +1,829 @@
+<UserControl x:Class="ValGrid.Controls.CareerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:objects="clr-namespace:ValGrid.Objects"
+             xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+             x:Name="CareerRoot"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             mc:Ignorable="d" Background="Transparent"
+             d:DesignHeight="850" d:DesignWidth="1400">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <FontFamily x:Key="Nunito">/Assets/#Nunito</FontFamily>
+
+        <Style x:Key="ModernFilterRadioStyle" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="RadioBorder" Background="#141828" BorderBrush="#26334d" BorderThickness="1"
+                                CornerRadius="6" Padding="6,4" Margin="2,0" Cursor="Hand">
+                            <TextBlock Text="{TemplateBinding Content}" FontFamily="{StaticResource Nunito}"
+                                       FontSize="11" FontWeight="SemiBold" Foreground="#8e9bb5" HorizontalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="RadioBorder" Property="Background" Value="#1f2d48" />
+                                <Setter TargetName="RadioBorder" Property="BorderBrush" Value="#38bdf8" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RadioBorder" Property="BorderBrush" Value="#3b82f6" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="#77000000" MouseLeftButtonUp="Backdrop_Click">
+        <!-- Main Career Window -->
+        <Border Background="#161a2b" CornerRadius="16" Margin="14,8" Padding="14"
+                BorderBrush="#2d3550" BorderThickness="1.5"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                MouseLeftButtonUp="InnerBorder_Click">
+
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- TOP BAR -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title & Subtitle -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <fa:ImageAwesome Icon="Solid_Scroll" PrimaryColor="White" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="CareerTitleText" Text="KARİYER &amp; MAÇ GEÇMİŞİ"
+                                       FontFamily="{StaticResource Nunito}" FontSize="22" FontWeight="ExtraBold"
+                                       Foreground="White" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock x:Name="CareerSubText" Text="Geçmiş maçların detayları, takımların envanterleri, takılı silahlar ve oyuncu notları"
+                                   FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" Margin="30,2,0,0" />
+                    </StackPanel>
+
+                    <!-- Match Summary Badge in Header -->
+                    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Background="#1f263d" CornerRadius="10" Padding="14,6"
+                            BorderBrush="#384469" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="MatchCountLabel" Text="Kayıtlı Maç Sayısı: " FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5" />
+                            <TextBlock x:Name="MatchCountText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#32e2b2" Margin="0,0,14,0" />
+                            <TextBlock x:Name="PlayerCountLabel" Text="Toplam Oyuncu: " FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5" />
+                            <TextBlock x:Name="PlayerCountText" Text="0" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#ffd700" Margin="0,0,14,0" />
+                            <TextBlock x:Name="WinRateLabel" Text="Kazanma Oranı: " FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5" />
+                            <TextBlock x:Name="WinRateText" Text="-" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#38bdf8" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Close Button -->
+                    <Button Grid.Column="2" Click="Close_Click"
+                            Background="#2d3550" BorderBrush="#e55b5b" BorderThickness="1.5"
+                            Cursor="Hand" Height="42" Padding="18,0" VerticalAlignment="Center">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8" />
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="✕" FontSize="16" FontWeight="Bold" Foreground="#e55b5b" Margin="0,0,8,0" />
+                            <TextBlock x:Name="CareerCloseEscText" Text="KAPAT (ESC)" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- MAIN SPLIT CONTENT -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="380" MinWidth="320" MaxWidth="440" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LEFT: MATCH CARD LIST -->
+                    <Border Grid.Column="0" Background="#1c2136" CornerRadius="12" Margin="0,0,10,0"
+                            BorderBrush="#2d3550" BorderThickness="1" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- SEARCH & FILTER BAR -->
+                            <StackPanel Grid.Row="0" Margin="4,2,4,8">
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="MatchesHeaderLabel" Text="Oynanan Maçlar"
+                                               FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold"
+                                               Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="FilteredCountText" Grid.Column="1" Text=""
+                                               FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#64748b" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- Search Input Box -->
+                                <Border Background="#121626" CornerRadius="8" BorderBrush="#2e3a58" BorderThickness="1" Padding="8,4" Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <fa:ImageAwesome Icon="Solid_MagnifyingGlass" PrimaryColor="#94a3b8" Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBox x:Name="CareerSearchBox" Grid.Column="1"
+                                                 Background="Transparent" BorderThickness="0"
+                                                 Foreground="White" FontFamily="{StaticResource Nunito}" FontSize="12"
+                                                 CaretBrush="#38bdf8" TextChanged="CareerSearchBox_TextChanged" />
+                                        <TextBlock x:Name="CareerSearchPlaceholder" Text="Harita veya ajan ara..." Grid.Column="1"
+                                                   FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#475569"
+                                                   IsHitTestVisible="False" VerticalAlignment="Center"
+                                                   Visibility="{Binding ElementName=CareerSearchBox, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <Button Grid.Column="2" x:Name="ClearCareerSearchBtn" Click="ClearCareerSearch_Click"
+                                                Content="✕" Foreground="#64748b" Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" FontSize="11" Visibility="Collapsed" VerticalAlignment="Center" Margin="4,0,0,0" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Filter Radios: Tümü | Galibiyet | Mağlubiyet -->
+                                <UniformGrid Columns="3" Margin="0,0,0,2">
+                                    <RadioButton x:Name="FilterAllRadio" Content="Tümü" IsChecked="True"
+                                                 Checked="CareerFilter_Checked" Style="{StaticResource ModernFilterRadioStyle}" />
+                                    <RadioButton x:Name="FilterWinRadio" Content="🟢 Galibiyet"
+                                                 Checked="CareerFilter_Checked" Style="{StaticResource ModernFilterRadioStyle}" />
+                                    <RadioButton x:Name="FilterLossRadio" Content="🔴 Mağlubiyet"
+                                                 Checked="CareerFilter_Checked" Style="{StaticResource ModernFilterRadioStyle}" />
+                                </UniformGrid>
+                            </StackPanel>
+
+                            <!-- Empty state if no matches -->
+                            <TextBlock x:Name="NoMatchesPrompt" Grid.Row="1"
+                                       Text="Henüz kaydedilmiş bir maç bulunmuyor. Bir maça girdiğinizde tüm takım envanterleri ve oyuncular otomatik buraya kaydedilecektir."
+                                       FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#627091"
+                                       TextWrapping="Wrap" TextAlignment="Center" Margin="20,50"
+                                       Visibility="Collapsed" />
+
+                            <!-- List of Matches -->
+                            <ListBox x:Name="MatchListBox" Grid.Row="1"
+                                     Background="Transparent" BorderThickness="0"
+                                     SelectionChanged="MatchListBox_SelectionChanged"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0,0,0,8" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <ContentPresenter />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type objects:MatchHistoryItem}">
+                                        <Border x:Name="CardBorder" Background="#212840" CornerRadius="10"
+                                                BorderBrush="#323c5e" BorderThickness="1" Padding="10,8" Cursor="Hand">
+                                            <Border.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Bu Maçı Geçmişten Sil" Tag="{Binding}" Click="DeleteContextMatch_Click">
+                                                        <MenuItem.Icon>
+                                                            <fa:ImageAwesome Icon="Solid_TrashCan" PrimaryColor="#ef4444" Width="12" Height="12" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Border.ContextMenu>
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="6" ShadowDepth="2" Color="Black" Opacity="0.4" />
+                                            </Border.Effect>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="6" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Left result indicator strip -->
+                                                <Border Grid.Column="0" Background="{Binding ResultColor}" CornerRadius="3" Margin="0,0,8,0" />
+
+                                                <!-- Middle details -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding MapName}" FontFamily="{StaticResource Nunito}" FontSize="15" FontWeight="Bold" Foreground="White" />
+                                                        <TextBlock Text=" • " Foreground="#6b7a9e" FontSize="13" />
+                                                        <TextBlock Text="{Binding GameMode}" FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                        <Border Background="{Binding ResultBadgeBg}" CornerRadius="5" Padding="6,2" Margin="0,0,8,0">
+                                                            <TextBlock Text="{Binding Result}" FontFamily="{StaticResource Nunito}" FontSize="11" FontWeight="Bold" Foreground="{Binding ResultColor}" />
+                                                        </Border>
+                                                        <TextBlock Text="{Binding Score}" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                        <fa:ImageAwesome Icon="Solid_Gem" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding TotalInventoryCombinedText}" FontFamily="{StaticResource Nunito}" FontSize="11" FontWeight="SemiBold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- Right: Date & Agent Icon -->
+                                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Date}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#6b7a9e" HorizontalAlignment="Right" />
+                                                    <Border Margin="0,4,0,0" Width="32" Height="32" CornerRadius="16" Background="#161a2b" BorderBrush="#384469" BorderThickness="1" HorizontalAlignment="Right">
+                                                        <Image Source="{Binding MyAgentIcon}" Stretch="Uniform" />
+                                                    </Border>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- RIGHT: SELECTED MATCH SCOREBOARD & WEAPONS -->
+                    <Border Grid.Column="1" Background="#1c2136" CornerRadius="12" Margin="10,0,0,0"
+                            BorderBrush="#2d3550" BorderThickness="1" Padding="14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Match Header Info Banner -->
+                            <Border Grid.Row="0" Background="#242b46" CornerRadius="10" Padding="14,10" Margin="0,0,0,12"
+                                    BorderBrush="#384469" BorderThickness="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock x:Name="SelectedMapTitle" Text="Harita"
+                                                       FontFamily="{StaticResource Nunito}" FontSize="22" FontWeight="Bold" Foreground="White" />
+                                            <TextBlock Text=" • " Foreground="#6b7a9e" FontSize="18" />
+                                            <TextBlock x:Name="SelectedModeTitle" Text="Mod"
+                                                       FontFamily="{StaticResource Nunito}" FontSize="16" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                            <TextBlock Text=" • " Foreground="#6b7a9e" FontSize="18" />
+                                            <TextBlock x:Name="SelectedDateTitle" Text="Tarih"
+                                                       FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                            <TextBlock x:Name="MatchTotalValueLabel" Text="Maçın Toplam Envanter Değeri: " FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="SelectedTotalValueText" Text="0 VP (~0 TL)" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="EquippedOnlyLabel" Text=" (SADECE TAKILI OLANLAR)" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="ExtraBold" Foreground="#f59e0b" VerticalAlignment="Center" Margin="6,0,0,0" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Score Box & Action Buttons -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Background="#181d2f" CornerRadius="8" Padding="16,8"
+                                                BorderBrush="#384469" BorderThickness="1" VerticalAlignment="Center">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock x:Name="SelectedResultBadge" Text="KAZANDIK"
+                                                           FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#32e2b2" HorizontalAlignment="Center" />
+                                                <TextBlock x:Name="SelectedScoreText" Text="13 - 9"
+                                                           FontFamily="{StaticResource Nunito}" FontSize="18" FontWeight="ExtraBold" Foreground="White" HorizontalAlignment="Center" Margin="0,2,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Button x:Name="DeleteCurrentMatchBtn" Click="DeleteCurrentMatch_Click"
+                                                Background="#22161b" BorderBrush="#50242e" BorderThickness="1"
+                                                Cursor="Hand" Height="48" Width="42" Margin="8,0,0,0" Padding="0"
+                                                ToolTip="Bu maçı geçmişten sil">
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="8" />
+                                                </Style>
+                                            </Button.Resources>
+                                            <fa:ImageAwesome Icon="Solid_TrashCan" PrimaryColor="#ef4444" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Scrollable Scoreboard & Teams -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel Margin="0,0,4,0">
+                                    <!-- OUR TEAM (BİZİM TAKIM) -->
+                                    <Border Background="#1b233a" CornerRadius="8" Padding="10,6" Margin="0,0,0,6"
+                                            BorderBrush="#5b92e5" BorderThickness="1">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <fa:ImageAwesome Icon="Solid_ShieldHalved" PrimaryColor="#5b92e5" Width="13" Height="13" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="OurTeamTitleText" Text="BİZİM TAKIM" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#5b92e5" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="OurTeamValueText" Text="Toplam: 0 VP" FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <ItemsControl x:Name="OurTeamItemsControl" Margin="0,0,0,16">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type objects:MatchHistoryPlayerItem}">
+                                                <Border Background="{Binding RowBackground}" CornerRadius="10" Padding="12,10" Margin="0,0,0,8"
+                                                        BorderBrush="{Binding RowBorderBrush}" BorderThickness="{Binding RowBorderThickness}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="54" />
+                                                            <ColumnDefinition Width="180" />
+                                                            <ColumnDefinition Width="140" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- Agent Icon with Level Badge -->
+                                                        <Grid Grid.Column="0" Width="48" Height="48" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                            <Border Width="44" Height="44" CornerRadius="22" Background="#161a2b" BorderBrush="#5b92e5" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                <Image Source="{Binding AgentIcon}" Stretch="Uniform" />
+                                                            </Border>
+                                                            <!-- Account Level Badge -->
+                                                            <Border Background="#32e2b2" CornerRadius="4" Padding="3,1"
+                                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                    Visibility="{Binding AccountLevelVisibility}"
+                                                                    ToolTip="Hesap Seviyesi" ToolTipService.InitialShowDelay="0">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect BlurRadius="4" ShadowDepth="1" Color="Black" Opacity="0.8" />
+                                                                </Border.Effect>
+                                                                <TextBlock Text="{Binding AccountLevel}" FontFamily="{StaticResource Nunito}"
+                                                                           FontWeight="Bold" Foreground="Black" FontSize="9" />
+                                                            </Border>
+                                                        </Grid>
+
+                                                        <!-- Name, Agent & Encounter Badge -->
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                                                            <TextBlock Text="{Binding Username}" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding AgentName}" FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                                                <Border Background="#261b3b" CornerRadius="5" Padding="6,2" Margin="6,0,0,0"
+                                                                        BorderBrush="#a855f7" BorderThickness="1"
+                                                                        Visibility="{Binding EncounterVisibility}"
+                                                                        ToolTip="{Binding EncounterTooltip}" ToolTipService.InitialShowDelay="0"
+                                                                        VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding EncounterBadgeText}" FontFamily="{StaticResource Nunito}"
+                                                                               FontSize="10" FontWeight="Bold" Foreground="#c084fc" VerticalAlignment="Center" />
+                                                                </Border>
+                                                            </StackPanel>
+                                                        </StackPanel>
+
+                                                        <!-- Rank & Peak Rank -->
+                                                        <Grid Grid.Column="2" VerticalAlignment="Center" Margin="4,0" ToolTip="{Binding PeakRankTooltip}" ToolTipService.InitialShowDelay="0">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- Rank Icon with Peak Rank mini badge -->
+                                                            <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                                <Image Source="{Binding RankIcon}" Width="30" Height="30" Stretch="Uniform"
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                                                <!-- Mini Peak Rank Badge -->
+                                                                <Border Width="16" Height="16" CornerRadius="8" Background="#2E3349" BorderBrush="#ffd700" BorderThickness="1"
+                                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                                        Visibility="{Binding PeakRankIconVisibility}">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="3" ShadowDepth="1" Color="Black" Opacity="0.8" />
+                                                                    </Border.Effect>
+                                                                    <Image Source="{Binding PeakRankIcon}" Width="12" Height="12" Stretch="Uniform"
+                                                                           RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                </Border>
+                                                            </Grid>
+
+                                                            <!-- Rank Names: Current + Peak Rank -->
+                                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding RankName}" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold"
+                                                                               Foreground="#e2e8f0" TextTrimming="CharacterEllipsis" MaxWidth="100" VerticalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding RankRrFormatted}" FontFamily="{StaticResource Nunito}" FontSize="10"
+                                                                               Foreground="#32e2b2" Margin="4,0,0,0" VerticalAlignment="Center"
+                                                                               Visibility="{Binding HasRankProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                                </StackPanel>
+                                                                <TextBlock Text="{Binding PeakRankDisplay}" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="Bold"
+                                                                           Foreground="#ffd700" TextTrimming="CharacterEllipsis" MaxWidth="110"
+                                                                           Visibility="{Binding PeakRankVisibility}" />
+                                                            </StackPanel>
+                                                        </Grid>
+
+                                                        <!-- Weapon Skins (Large, Clickable to open Inventory) -->
+                                                        <ItemsControl Grid.Column="3" ItemsSource="{Binding Weapons}" VerticalAlignment="Center">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <StackPanel Orientation="Horizontal" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate DataType="{x:Type objects:MatchHistoryWeaponItem}">
+                                                                    <Border Background="#14192b" CornerRadius="8" Padding="6,3" Margin="0,0,8,0"
+                                                                            BorderBrush="{Binding TierColor}" BorderThickness="1.2"
+                                                                            Cursor="Hand" MouseLeftButtonUp="Weapon_Click"
+                                                                            ToolTip="{Binding WeaponName}" ToolTipService.InitialShowDelay="0">
+                                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                            <Image Source="{Binding SkinImage}" Width="66" Height="28" Stretch="Uniform" Margin="0,0,4,0" />
+                                                                            <TextBlock Text="⭐" FontSize="11" Foreground="#ffd700" Visibility="{Binding IsRare, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" />
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+
+                                                        <!-- Inventory Value (Clickable to open Inventory) -->
+                                                        <StackPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,14,0"
+                                                                    Cursor="Hand" MouseLeftButtonUp="OpenInventory_Click"
+                                                                    ToolTip="Tüm Envanter Detayını Aç" ToolTipService.InitialShowDelay="0">
+                                                            <TextBlock Text="{Binding TotalValueFormatted}" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ffd700" HorizontalAlignment="Right" />
+                                                            <TextBlock Text="{Binding TotalValueTlFormatted}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#32e2b2" HorizontalAlignment="Right" />
+                                                        </StackPanel>
+
+                                                        <!-- Note & Buttons -->
+                                                        <StackPanel Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                            <!-- Note Badge if exists -->
+                                                            <Border Background="#2a2e1d" CornerRadius="5" Padding="6,2" Margin="0,0,0,4"
+                                                                    BorderBrush="#f0b232" BorderThickness="1"
+                                                                    Visibility="{Binding NoteVisibility}" ToolTip="{Binding Note}">
+                                                                <TextBlock Text="{Binding NoteDisplayText}" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold" Foreground="#f0b232" TextTrimming="CharacterEllipsis" MaxWidth="140" />
+                                                            </Border>
+                                                            <!-- Button Row: Envanter + Not -->
+                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                                <Button Tag="{Binding}" Click="OpenInventory_Click"
+                                                                        Background="#162a3a" BorderBrush="#32e2b2" BorderThickness="1"
+                                                                        Cursor="Hand" Height="25" Padding="7,0" Margin="0,0,5,0"
+                                                                        ToolTip="Tüm silah ve kozmetik envanterini aç">
+                                                                    <Button.Resources>
+                                                                        <Style TargetType="Border">
+                                                                            <Setter Property="CornerRadius" Value="5" />
+                                                                        </Style>
+                                                                    </Button.Resources>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Briefcase" PrimaryColor="#32e2b2" Width="11" Height="11" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="Envanter" FontFamily="{StaticResource Nunito}" FontSize="11" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <Button Tag="{Binding}" Click="EditPlayerNote_Click"
+                                                                        Background="#1a2035" BorderBrush="#3c496e" BorderThickness="1"
+                                                                        Cursor="Hand" Height="25" Padding="7,0" Margin="0,0,5,0"
+                                                                        ToolTip="Bu oyuncuya özel not yaz">
+                                                                    <Button.Resources>
+                                                                        <Style TargetType="Border">
+                                                                            <Setter Property="CornerRadius" Value="5" />
+                                                                        </Style>
+                                                                    </Button.Resources>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#d1d5db" Width="11" Height="11" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="Not" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#d1d5db" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <!-- Kız Oyuncu Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding FemaleBackground}"
+                                                                        BorderBrush="{Binding FemaleBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6" Margin="0,0,5,0"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerFemale_Click"
+                                                                        ToolTip="{Binding FemaleTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#ff79c6" Opacity="{Binding FemaleGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Venus" PrimaryColor="{Binding FemaleIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                                <!-- Erkek Oyuncu Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding MaleBackground}"
+                                                                        BorderBrush="{Binding MaleBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6" Margin="0,0,5,0"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerMale_Click"
+                                                                        ToolTip="{Binding MaleTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#38bdf8" Opacity="{Binding MaleGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Mars" PrimaryColor="{Binding MaleIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                                <!-- Kara Liste Engel Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding BlacklistBackground}"
+                                                                        BorderBrush="{Binding BlacklistBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerBlacklist_Click"
+                                                                        ToolTip="{Binding BlacklistTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#ef4444" Opacity="{Binding BlacklistGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="{Binding BlacklistIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- ENEMY TEAM (KARŞI TAKIM) -->
+                                    <Border x:Name="EnemyTeamHeaderBorder" Background="#2b1c24" CornerRadius="8" Padding="10,6" Margin="0,6,0,6"
+                                            BorderBrush="#e55b5b" BorderThickness="1">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <fa:ImageAwesome Icon="Solid_Crosshairs" PrimaryColor="#e55b5b" Width="13" Height="13" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="EnemyTeamTitleText" Text="KARŞI TAKIM" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="#e55b5b" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="EnemyTeamValueText" Text="Toplam: 0 VP" FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <ItemsControl x:Name="EnemyTeamItemsControl">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type objects:MatchHistoryPlayerItem}">
+                                                <Border Background="{Binding RowBackground}" CornerRadius="10" Padding="12,10" Margin="0,0,0,8"
+                                                        BorderBrush="{Binding RowBorderBrush}" BorderThickness="{Binding RowBorderThickness}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="54" />
+                                                            <ColumnDefinition Width="180" />
+                                                            <ColumnDefinition Width="140" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- Agent Icon with Level Badge -->
+                                                        <Grid Grid.Column="0" Width="48" Height="48" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                            <Border Width="44" Height="44" CornerRadius="22" Background="#161a2b" BorderBrush="#e55b5b" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                <Image Source="{Binding AgentIcon}" Stretch="Uniform" />
+                                                            </Border>
+                                                            <!-- Account Level Badge -->
+                                                            <Border Background="#32e2b2" CornerRadius="4" Padding="3,1"
+                                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                    Visibility="{Binding AccountLevelVisibility}"
+                                                                    ToolTip="Hesap Seviyesi" ToolTipService.InitialShowDelay="0">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect BlurRadius="4" ShadowDepth="1" Color="Black" Opacity="0.8" />
+                                                                </Border.Effect>
+                                                                <TextBlock Text="{Binding AccountLevel}" FontFamily="{StaticResource Nunito}"
+                                                                           FontWeight="Bold" Foreground="Black" FontSize="9" />
+                                                            </Border>
+                                                        </Grid>
+
+                                                        <!-- Name, Agent & Encounter Badge -->
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                                                            <TextBlock Text="{Binding Username}" FontFamily="{StaticResource Nunito}" FontSize="14" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding AgentName}" FontFamily="{StaticResource Nunito}" FontSize="12" Foreground="#8e9bb5" VerticalAlignment="Center" />
+                                                                <Border Background="#261b3b" CornerRadius="5" Padding="6,2" Margin="6,0,0,0"
+                                                                        BorderBrush="#a855f7" BorderThickness="1"
+                                                                        Visibility="{Binding EncounterVisibility}"
+                                                                        ToolTip="{Binding EncounterTooltip}" ToolTipService.InitialShowDelay="0"
+                                                                        VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding EncounterBadgeText}" FontFamily="{StaticResource Nunito}"
+                                                                               FontSize="10" FontWeight="Bold" Foreground="#c084fc" VerticalAlignment="Center" />
+                                                                </Border>
+                                                            </StackPanel>
+                                                        </StackPanel>
+
+                                                        <!-- Rank & Peak Rank -->
+                                                        <Grid Grid.Column="2" VerticalAlignment="Center" Margin="4,0" ToolTip="{Binding PeakRankTooltip}" ToolTipService.InitialShowDelay="0">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- Rank Icon with Peak Rank mini badge -->
+                                                            <Grid Grid.Column="0" Width="36" Height="36" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                                <Image Source="{Binding RankIcon}" Width="30" Height="30" Stretch="Uniform"
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                                                <!-- Mini Peak Rank Badge -->
+                                                                <Border Width="16" Height="16" CornerRadius="8" Background="#2E3349" BorderBrush="#ffd700" BorderThickness="1"
+                                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                                        Visibility="{Binding PeakRankIconVisibility}">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="3" ShadowDepth="1" Color="Black" Opacity="0.8" />
+                                                                    </Border.Effect>
+                                                                    <Image Source="{Binding PeakRankIcon}" Width="12" Height="12" Stretch="Uniform"
+                                                                           RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                </Border>
+                                                            </Grid>
+
+                                                            <!-- Rank Names: Current + Peak Rank -->
+                                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding RankName}" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="SemiBold"
+                                                                               Foreground="#e2e8f0" TextTrimming="CharacterEllipsis" MaxWidth="100" VerticalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding RankRrFormatted}" FontFamily="{StaticResource Nunito}" FontSize="10"
+                                                                               Foreground="#32e2b2" Margin="4,0,0,0" VerticalAlignment="Center"
+                                                                               Visibility="{Binding HasRankProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                                </StackPanel>
+                                                                <TextBlock Text="{Binding PeakRankDisplay}" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="Bold"
+                                                                           Foreground="#ffd700" TextTrimming="CharacterEllipsis" MaxWidth="110"
+                                                                           Visibility="{Binding PeakRankVisibility}" />
+                                                            </StackPanel>
+                                                        </Grid>
+
+                                                        <!-- Weapon Skins (Large, Clickable to open Inventory) -->
+                                                        <ItemsControl Grid.Column="3" ItemsSource="{Binding Weapons}" VerticalAlignment="Center">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <StackPanel Orientation="Horizontal" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate DataType="{x:Type objects:MatchHistoryWeaponItem}">
+                                                                    <Border Background="#161b2e" CornerRadius="8" Padding="6,3" Margin="0,0,8,0"
+                                                                            BorderBrush="{Binding TierColor}" BorderThickness="1.2"
+                                                                            Cursor="Hand" MouseLeftButtonUp="Weapon_Click"
+                                                                            ToolTip="{Binding WeaponName}" ToolTipService.InitialShowDelay="0">
+                                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                            <Image Source="{Binding SkinImage}" Width="66" Height="28" Stretch="Uniform" Margin="0,0,4,0" />
+                                                                            <TextBlock Text="⭐" FontSize="11" Foreground="#ffd700" Visibility="{Binding IsRare, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" />
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+
+                                                        <!-- Inventory Value (Clickable to open Inventory) -->
+                                                        <StackPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,14,0"
+                                                                    Cursor="Hand" MouseLeftButtonUp="OpenInventory_Click"
+                                                                    ToolTip="Tüm Envanter Detayını Aç" ToolTipService.InitialShowDelay="0">
+                                                            <TextBlock Text="{Binding TotalValueFormatted}" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ffd700" HorizontalAlignment="Right" />
+                                                            <TextBlock Text="{Binding TotalValueTlFormatted}" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#32e2b2" HorizontalAlignment="Right" />
+                                                        </StackPanel>
+
+                                                        <!-- Note & Buttons -->
+                                                        <StackPanel Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                            <Border Background="#2a2e1d" CornerRadius="5" Padding="6,2" Margin="0,0,0,4"
+                                                                    BorderBrush="#f0b232" BorderThickness="1"
+                                                                    Visibility="{Binding NoteVisibility}" ToolTip="{Binding Note}">
+                                                                <TextBlock Text="{Binding NoteDisplayText}" FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold" Foreground="#f0b232" TextTrimming="CharacterEllipsis" MaxWidth="140" />
+                                                            </Border>
+                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                                <Button Tag="{Binding}" Click="OpenInventory_Click"
+                                                                        Background="#162a3a" BorderBrush="#32e2b2" BorderThickness="1"
+                                                                        Cursor="Hand" Height="25" Padding="7,0" Margin="0,0,5,0"
+                                                                        ToolTip="Tüm silah ve kozmetik envanterini aç">
+                                                                    <Button.Resources>
+                                                                        <Style TargetType="Border">
+                                                                            <Setter Property="CornerRadius" Value="5" />
+                                                                        </Style>
+                                                                    </Button.Resources>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Briefcase" PrimaryColor="#32e2b2" Width="11" Height="11" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="Envanter" FontFamily="{StaticResource Nunito}" FontSize="11" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                 <Button Tag="{Binding}" Click="EditPlayerNote_Click"
+                                                                        Background="#1a2035" BorderBrush="#3c496e" BorderThickness="1"
+                                                                        Cursor="Hand" Height="25" Padding="7,0" Margin="0,0,5,0"
+                                                                        ToolTip="Bu oyuncuya özel not yaz">
+                                                                    <Button.Resources>
+                                                                        <Style TargetType="Border">
+                                                                            <Setter Property="CornerRadius" Value="5" />
+                                                                        </Style>
+                                                                    </Button.Resources>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#d1d5db" Width="11" Height="11" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                                        <TextBlock Text="Not" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#d1d5db" VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <!-- Kız Oyuncu Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding FemaleBackground}"
+                                                                        BorderBrush="{Binding FemaleBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6" Margin="0,0,5,0"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerFemale_Click"
+                                                                        ToolTip="{Binding FemaleTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#ff79c6" Opacity="{Binding FemaleGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Venus" PrimaryColor="{Binding FemaleIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                                <!-- Erkek Oyuncu Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding MaleBackground}"
+                                                                        BorderBrush="{Binding MaleBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6" Margin="0,0,5,0"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerMale_Click"
+                                                                        ToolTip="{Binding MaleTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#38bdf8" Opacity="{Binding MaleGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Mars" PrimaryColor="{Binding MaleIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                                <!-- Kara Liste Engel Butonu -->
+                                                                <Border Width="34" Height="25"
+                                                                        Background="{Binding BlacklistBackground}"
+                                                                        BorderBrush="{Binding BlacklistBorder}"
+                                                                        BorderThickness="1.2" CornerRadius="6"
+                                                                        VerticalAlignment="Center" Cursor="Hand"
+                                                                        MouseLeftButtonUp="CareerBlacklist_Click"
+                                                                        ToolTip="{Binding BlacklistTooltip}"
+                                                                        ToolTipService.InitialShowDelay="0">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="6" ShadowDepth="0" Color="#ef4444" Opacity="{Binding BlacklistGlowOpacity}" />
+                                                                    </Border.Effect>
+                                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <fa:ImageAwesome Icon="Solid_Ban" PrimaryColor="{Binding BlacklistIconBrush}" Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- IN-PLACE NOTE EDITOR MODAL OVERLAY -->
+        <Border x:Name="NoteEditModal" Background="#99000000" Visibility="Collapsed"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="9998">
+            <Border Background="#22283e" CornerRadius="14" Width="440" Padding="20"
+                    BorderBrush="#3d496e" BorderThickness="1.5"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="25" ShadowDepth="8" Color="Black" Opacity="0.8" />
+                </Border.Effect>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                        <fa:ImageAwesome Icon="Solid_PenToSquare" PrimaryColor="#38bdf8" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Oyuncu Notu Düzenle" FontFamily="{StaticResource Nunito}" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock x:Name="NoteModalPlayerName" Text="Oyuncu Adı" FontFamily="{StaticResource Nunito}" FontSize="13" Foreground="#32e2b2" Margin="0,4,0,12" />
+
+                    <TextBox x:Name="NoteInputBox" Height="70" TextWrapping="Wrap" AcceptsReturn="True"
+                             Background="#141828" Foreground="White" BorderBrush="#4a5780" BorderThickness="1"
+                             FontFamily="{StaticResource Nunito}" FontSize="13" Padding="8" />
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                        <Button Click="CancelNote_Click" Content="İptal"
+                                Background="#2c334d" Foreground="#d1d5db" BorderThickness="0"
+                                Cursor="Hand" Width="90" Height="32" Margin="0,0,10,0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Click="SaveNote_Click" Content="Kaydet"
+                                Background="#007ef9" Foreground="White" FontWeight="Bold" BorderThickness="0"
+                                Cursor="Hand" Width="100" Height="32">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- FULL INVENTORY INSPECT MODAL OVERLAY -->
+        <Grid x:Name="InventoryModalOverlay" Background="#99000000" Visibility="Collapsed"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="10000"
+              MouseLeftButtonUp="InventoryBackdrop_Click">
+            <ContentControl x:Name="InventoryModalHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Grid>
+    </Grid>
+</UserControl>
+
