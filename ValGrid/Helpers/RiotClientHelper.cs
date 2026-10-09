@@ -34,7 +34,7 @@ public static class RiotClientHelper
             var jsonPath = Path.Combine(pData, "Riot Games", "RiotClientInstalls.json");
             if (File.Exists(jsonPath))
             {
-                var content = File.ReadAllText(jsonPath);
+                var content = File.ReadAllText(jsonPath).Trim().Trim('\uFEFF', '\u200B');
                 using var doc = JsonDocument.Parse(content);
 
                 if (doc.RootElement.TryGetProperty("rc_default", out var rcDef) &&
@@ -89,7 +89,7 @@ public static class RiotClientHelper
             var jsonPath = Path.Combine(pData, "Riot Games", "RiotClientInstalls.json");
             if (File.Exists(jsonPath))
             {
-                var content = File.ReadAllText(jsonPath);
+                var content = File.ReadAllText(jsonPath).Trim().Trim('\uFEFF', '\u200B');
                 using var doc = JsonDocument.Parse(content);
                 if (doc.RootElement.TryGetProperty("associated_client", out var assoc))
                 {
@@ -202,13 +202,13 @@ public static class RiotClientHelper
                         var validLogin = await Checks.CheckLoginAsync().ConfigureAwait(false);
                         if (validLogin || (Constants.Ppuuid != Guid.Empty && !string.IsNullOrEmpty(Constants.AccessToken)))
                         {
-                            onStatusUpdate?.Invoke("Giriş başarılı! Mağaza verileri çekiliyor...");
+                            onStatusUpdate?.Invoke(L10n.IsEnglish ? "Login successful! Fetching store data..." : "Giriş başarılı! Mağaza verileri çekiliyor...");
                             return true;
                         }
                     }
                     else
                     {
-                        onStatusUpdate?.Invoke("Riot Client algılandı! Kullanıcı girişi bekleniyor...");
+                        onStatusUpdate?.Invoke(L10n.IsEnglish ? "Riot Client detected! Waiting for user login..." : "Riot Client algılandı! Kullanıcı girişi bekleniyor...");
                         retryCount++;
                         // If lockfile exists but local login fails repeatedly (e.g. background stub), poke LaunchRiotClient once
                         if (retryCount == 4)
@@ -219,7 +219,7 @@ public static class RiotClientHelper
                 }
                 else
                 {
-                    onStatusUpdate?.Invoke("Riot Client başlatılması bekleniyor...");
+                    onStatusUpdate?.Invoke(L10n.IsEnglish ? "Waiting for Riot Client to start..." : "Riot Client başlatılması bekleniyor...");
                     retryCount++;
                     if (retryCount % 4 == 0)
                     {

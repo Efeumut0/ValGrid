@@ -98,7 +98,7 @@
         <Border Background="#E6070912" PreviewMouseDown="Backdrop_MouseDown" />
 
         <!-- Main Modal Window -->
-        <Border x:Name="ModalBorder" Margin="40,25" MaxWidth="1280" MaxHeight="780"
+        <Border x:Name="ModalBorder" Margin="24,14" MaxWidth="1280" MaxHeight="780"
                 Background="#0e1322" CornerRadius="18"
                 BorderBrush="#25324d" BorderThickness="1.5"
                 HorizontalAlignment="Center" VerticalAlignment="Center"

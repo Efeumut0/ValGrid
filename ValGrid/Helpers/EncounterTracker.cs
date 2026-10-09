@@ -68,7 +68,7 @@ public static class EncounterTracker
             {
                 if (File.Exists(FilePath))
                 {
-                    var rawText = File.ReadAllText(FilePath);
+                    var rawText = File.ReadAllText(FilePath).Trim().Trim('\uFEFF', '\u200B');
                     if (rawText.Contains("AppData/Local/NOWT") || rawText.Contains("AppData/Local/ValPulse") ||
                         rawText.Contains("AppData\\Local\\NOWT") || rawText.Contains("AppData\\Local\\ValPulse"))
                     {
@@ -76,16 +76,31 @@ public static class EncounterTracker
                                          .Replace("AppData/Local/ValPulse", "AppData/Local/ValGrid")
                                          .Replace("AppData\\Local\\NOWT", "AppData\\Local\\ValGrid")
                                          .Replace("AppData\\Local\\ValPulse", "AppData\\Local\\ValGrid");
-                        try { File.WriteAllText(FilePath, rawText); } catch { }
+                        try { File.WriteAllText(FilePath, rawText, new System.Text.UTF8Encoding(false)); } catch { }
                     }
-                    _data = JsonSerializer.Deserialize<Dictionary<string, EncounterRecord>>(rawText) 
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        AllowTrailingCommas = true,
+                        ReadCommentHandling = JsonCommentHandling.Skip
+                    };
+                    _data = JsonSerializer.Deserialize<Dictionary<string, EncounterRecord>>(rawText, options) 
                             ?? new Dictionary<string, EncounterRecord>();
                 }
                 else
                     _data = new Dictionary<string, EncounterRecord>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Constants.Log?.Error(ex, "EncounterTracker load failed");
+                try
+                {
+                    if (File.Exists(FilePath) && new FileInfo(FilePath).Length > 0)
+                    {
+                        File.Copy(FilePath, FilePath + ".corrupt.bak", true);
+                    }
+                }
+                catch { }
                 _data = new Dictionary<string, EncounterRecord>();
             }
 
@@ -121,7 +136,7 @@ public static class EncounterTracker
                 var dir = Path.GetDirectoryName(FilePath);
                 if (!string.IsNullOrEmpty(dir))
                     Directory.CreateDirectory(dir);
-                File.WriteAllText(FilePath, json);
+                File.WriteAllText(FilePath, json, new System.Text.UTF8Encoding(false));
             }
             catch (Exception e)
             {

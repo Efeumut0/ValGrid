@@ -40,7 +40,7 @@ public class SkinInspectDetail
     public string WeaponType { get; set; } = "SİLAH";
     public int VpCost { get; set; }
     public string VpCostFormatted => $"{VpCost:N0} VP";
-    public string TlCostFormatted => $"~{CurrencyHelper.FormatTl(VpCost)}";
+    public string TlCostFormatted => CurrencyHelper.FormatApproximatePrice(VpCost);
     public string TierDevName { get; set; } = "Standard";
     public string TierDisplayName { get; set; } = "STANDART";
     public string TierColor { get; set; } = "#7f8c8d";

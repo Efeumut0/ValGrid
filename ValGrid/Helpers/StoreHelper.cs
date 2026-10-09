@@ -26,6 +26,16 @@ public static class StoreHelper
     private static Dictionary<Guid, ValNameImage> _spraysCache;
     private static Dictionary<Guid, ValNameImage> _buddiesCache;
     private static List<DailyStoreOffer> _allWeaponsCatalogCache;
+    private static string _catalogCacheLang;
+    private static readonly Dictionary<string, string> ContentTierMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "411e4a55-4e59-7757-41f0-86a53f101bb5", "Ultra" },
+        { "e046854e-406c-37f4-6607-19a9ba8426fc", "Exclusive" },
+        { "60bca009-4182-7998-dee7-b8a2558dc369", "Premium" },
+        { "0cebb8be-46d7-c12a-d306-e9907bfc5a25", "Deluxe" },
+        { "12683d76-48d7-84a3-4e09-6985794f0445", "Select" }
+    };
+
     private static readonly object CacheLock = new();
     private static readonly System.Net.Http.HttpClient HttpClient = new() { Timeout = TimeSpan.FromSeconds(8) };
 
@@ -66,43 +76,49 @@ public static class StoreHelper
             Dictionary<Guid, ValNameImage> skins = null;
             if (File.Exists(chromasPath))
             {
-                var json = await File.ReadAllTextAsync(chromasPath).ConfigureAwait(false);
-                skins = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                var json = (await File.ReadAllTextAsync(chromasPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    skins = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
             }
 
             Dictionary<Guid, ValSkinMeta> metas = null;
             if (File.Exists(metaPath))
             {
-                var json = await File.ReadAllTextAsync(metaPath).ConfigureAwait(false);
-                metas = JsonSerializer.Deserialize<Dictionary<Guid, ValSkinMeta>>(json);
+                var json = (await File.ReadAllTextAsync(metaPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    metas = JsonSerializer.Deserialize<Dictionary<Guid, ValSkinMeta>>(json);
             }
 
             Dictionary<Guid, ValNameImage> bundles = null;
             if (File.Exists(bundlesPath))
             {
-                var json = await File.ReadAllTextAsync(bundlesPath).ConfigureAwait(false);
-                bundles = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                var json = (await File.ReadAllTextAsync(bundlesPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    bundles = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
             }
 
             Dictionary<Guid, ValNameImage> cards = null;
             if (File.Exists(cardsPath))
             {
-                var json = await File.ReadAllTextAsync(cardsPath).ConfigureAwait(false);
-                cards = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                var json = (await File.ReadAllTextAsync(cardsPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    cards = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
             }
 
             Dictionary<Guid, ValNameImage> sprays = null;
             if (File.Exists(spraysPath))
             {
-                var json = await File.ReadAllTextAsync(spraysPath).ConfigureAwait(false);
-                sprays = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                var json = (await File.ReadAllTextAsync(spraysPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    sprays = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
             }
 
             Dictionary<Guid, ValNameImage> buddies = null;
             if (File.Exists(buddiesPath))
             {
-                var json = await File.ReadAllTextAsync(buddiesPath).ConfigureAwait(false);
-                buddies = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                var json = (await File.ReadAllTextAsync(buddiesPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                    buddies = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
             }
 
             lock (CacheLock)
@@ -1268,9 +1284,10 @@ public static class StoreHelper
 
     public static async Task<List<DailyStoreOffer>> GetAllWeaponsCatalogAsync()
     {
+        var activeLang = L10n.ValApiLanguage;
         lock (CacheLock)
         {
-            if (_allWeaponsCatalogCache != null && _allWeaponsCatalogCache.Count > 0)
+            if (_allWeaponsCatalogCache != null && _allWeaponsCatalogCache.Count > 0 && _catalogCacheLang == activeLang)
                 return _allWeaponsCatalogCache;
         }
 
@@ -1279,47 +1296,107 @@ public static class StoreHelper
         var list = new List<DailyStoreOffer>();
         try
         {
-            var allSkinsPath = Path.Combine(Constants.LocalAppDataPath ?? "", "ValAPI", "allskins.json");
-            if (File.Exists(allSkinsPath))
+            var skinsElement = await SkinInspectHelper.EnsureSkinsDataAsync().ConfigureAwait(false);
+            if (skinsElement.HasValue && skinsElement.Value.ValueKind == JsonValueKind.Array)
             {
-                var json = await File.ReadAllTextAsync(allSkinsPath).ConfigureAwait(false);
-                using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("data", out var skinsArray) && skinsArray.ValueKind == JsonValueKind.Array)
+                foreach (var s in skinsElement.Value.EnumerateArray())
                 {
-                    foreach (var s in skinsArray.EnumerateArray())
+                    var displayName = s.TryGetProperty("displayName", out var dn) ? dn.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(displayName) ||
+                        displayName.StartsWith("Standart ", StringComparison.OrdinalIgnoreCase) ||
+                        displayName.StartsWith("Standard ", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var uuidStr = s.TryGetProperty("uuid", out var u) ? u.GetString() : null;
+                    if (!Guid.TryParse(uuidStr, out var skinGuid))
+                        continue;
+
+                    var displayIcon = s.TryGetProperty("displayIcon", out var di) ? di.GetString() : null;
+                    if (string.IsNullOrEmpty(displayIcon))
                     {
-                        var displayName = s.TryGetProperty("displayName", out var dn) ? dn.GetString() : null;
-                        if (string.IsNullOrWhiteSpace(displayName) || displayName.StartsWith("Standart ", StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        var uuidStr = s.TryGetProperty("uuid", out var u) ? u.GetString() : null;
-                        if (!Guid.TryParse(uuidStr, out var skinGuid))
-                            continue;
-
-                        var displayIcon = s.TryGetProperty("displayIcon", out var di) ? di.GetString() : null;
-                        if (string.IsNullOrEmpty(displayIcon))
+                        if (s.TryGetProperty("levels", out var lvls) && lvls.ValueKind == JsonValueKind.Array && lvls.GetArrayLength() > 0)
                         {
-                            if (s.TryGetProperty("levels", out var lvls) && lvls.ValueKind == JsonValueKind.Array && lvls.GetArrayLength() > 0)
-                            {
-                                var l0 = lvls[0];
-                                if (l0.TryGetProperty("displayIcon", out var ldi))
-                                    displayIcon = ldi.GetString();
-                            }
+                            var l0 = lvls[0];
+                            if (l0.TryGetProperty("displayIcon", out var ldi))
+                                displayIcon = ldi.GetString();
                         }
+                    }
 
-                        if (string.IsNullOrEmpty(displayIcon))
-                            continue;
+                    if (string.IsNullOrEmpty(displayIcon))
+                        continue;
 
-                        var offer = ResolveSkinOffer(skinGuid, 0);
-                        offer.Name = displayName;
-                        offer.Image = new Uri(displayIcon);
-                        offer.WeaponType = DetectWeaponType(displayName);
+                    var offer = ResolveSkinOffer(skinGuid, 0);
+                    offer.Name = displayName;
+                    offer.Image = new Uri(displayIcon);
+                    offer.WeaponType = DetectWeaponType(displayName);
+                    bool isMelee = IsMeleeWeapon(displayName, offer.WeaponType);
+                    if (isMelee) offer.WeaponType = L10n.IsEnglish ? "MELEE" : "YAKIN DÖVÜŞ";
 
-                        if (offer.VpCost <= 0)
-                            offer.VpCost = GetAccurateSkinPrice(displayName, offer.TierDevName, IsMeleeWeapon(displayName, offer.WeaponType));
+                    if (s.TryGetProperty("contentTierUuid", out var ctu) && ctu.ValueKind == JsonValueKind.String)
+                    {
+                        var tierUuid = ctu.GetString();
+                        if (!string.IsNullOrEmpty(tierUuid) && ContentTierMap.TryGetValue(tierUuid, out var tierDevName))
+                        {
+                            offer.TierDevName = tierDevName;
+                        }
+                    }
 
-                        ApplyTierDetails(offer);
-                        list.Add(offer);
+                    if (offer.VpCost <= 0)
+                        offer.VpCost = GetAccurateSkinPrice(displayName, offer.TierDevName, isMelee);
+
+                    ApplyTierDetails(offer);
+                    list.Add(offer);
+                }
+            }
+            else
+            {
+                // Fallback: check legacy allskins.json if cached
+                var allSkinsPath = Path.Combine(Constants.LocalAppDataPath ?? "", "ValAPI", "allskins.json");
+                if (File.Exists(allSkinsPath))
+                {
+                    var json = (await File.ReadAllTextAsync(allSkinsPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    using var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("data", out var skinsArray) && skinsArray.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var s in skinsArray.EnumerateArray())
+                        {
+                            var displayName = s.TryGetProperty("displayName", out var dn) ? dn.GetString() : null;
+                            if (string.IsNullOrWhiteSpace(displayName) ||
+                                displayName.StartsWith("Standart ", StringComparison.OrdinalIgnoreCase) ||
+                                displayName.StartsWith("Standard ", StringComparison.OrdinalIgnoreCase))
+                                continue;
+
+                            var uuidStr = s.TryGetProperty("uuid", out var u) ? u.GetString() : null;
+                            if (!Guid.TryParse(uuidStr, out var skinGuid))
+                                continue;
+
+                            var displayIcon = s.TryGetProperty("displayIcon", out var di) ? di.GetString() : null;
+                            if (string.IsNullOrEmpty(displayIcon))
+                            {
+                                if (s.TryGetProperty("levels", out var lvls) && lvls.ValueKind == JsonValueKind.Array && lvls.GetArrayLength() > 0)
+                                {
+                                    var l0 = lvls[0];
+                                    if (l0.TryGetProperty("displayIcon", out var ldi))
+                                        displayIcon = ldi.GetString();
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(displayIcon))
+                                continue;
+
+                            var offer = ResolveSkinOffer(skinGuid, 0);
+                            offer.Name = displayName;
+                            offer.Image = new Uri(displayIcon);
+                            offer.WeaponType = DetectWeaponType(displayName);
+                            bool isMelee = IsMeleeWeapon(displayName, offer.WeaponType);
+                            if (isMelee) offer.WeaponType = L10n.IsEnglish ? "MELEE" : "YAKIN DÖVÜŞ";
+
+                            if (offer.VpCost <= 0)
+                                offer.VpCost = GetAccurateSkinPrice(displayName, offer.TierDevName, isMelee);
+
+                            ApplyTierDetails(offer);
+                            list.Add(offer);
+                        }
                     }
                 }
             }
@@ -1334,6 +1411,7 @@ public static class StoreHelper
         lock (CacheLock)
         {
             _allWeaponsCatalogCache = list;
+            _catalogCacheLang = activeLang;
         }
 
         return list;

@@ -11,16 +11,19 @@
 		</ItemGroup>
 	</Target>
 
+	<Target Name="ArchitecturePreviewGuard" BeforeTargets="BeforeBuild">
+		<Error Text="[ValGrid Kaynak] Bu depo yalnızca mimari yapı ve açık kaynak kod incelemesi amaçlıdır. Doğrudan derleme ve çalıştırılabilir paket üretimi devre dışı bırakılmıştır. ValGrid'i kullanmak için resmi kurulum paketini (ValGrid_Setup) indiriniz." />
+	</Target>
+
 	<PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Library</OutputType>
         <TargetFramework>net6.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <AssemblyName>ValGrid</AssemblyName>
         <ApplicationIcon>logo.ico</ApplicationIcon>
-        <Version>1.3.18</Version>
+        <Version>1.4.08</Version>
         <RootNamespace>ValGrid</RootNamespace>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-        <StartupObject>ValGrid.App</StartupObject>
         <Description>ValGrid - Valorant Canlı Maç, İstihbarat ve Mağaza Asistanı</Description>
         <Copyright>ValGrid Team</Copyright>
         <Product>ValGrid</Product>
@@ -35,8 +38,8 @@
         <IsPackable>false</IsPackable>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryType>git</RepositoryType>
-        <AssemblyVersion>1.3.18.0</AssemblyVersion>
-        <FileVersion>1.3.18</FileVersion>
+        <AssemblyVersion>1.4.8.0</AssemblyVersion>
+        <FileVersion>1.4.8.0</FileVersion>
         <Platforms>AnyCPU</Platforms>
         <Nullable>annotations</Nullable>
         <!-- Ensure NuGet analyzers/source-generators (MVVM Toolkit) run during WPF markup compilation -->

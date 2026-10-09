@@ -32,10 +32,18 @@ public static class NightMarketHelper
             {
                 if (File.Exists(RevealedPath))
                 {
-                    var json = File.ReadAllText(RevealedPath);
-                    var list = JsonSerializer.Deserialize<List<string>>(json);
-                    _revealedSet = new HashSet<string>(list ?? new List<string>(), StringComparer.OrdinalIgnoreCase);
-                    return _revealedSet;
+                    var json = File.ReadAllText(RevealedPath).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true,
+                            AllowTrailingCommas = true
+                        };
+                        var list = JsonSerializer.Deserialize<List<string>>(json, options);
+                        _revealedSet = new HashSet<string>(list ?? new List<string>(), StringComparer.OrdinalIgnoreCase);
+                        return _revealedSet;
+                    }
                 }
             }
             catch (Exception ex)
@@ -112,7 +120,7 @@ public static class NightMarketHelper
                 Directory.CreateDirectory(CacheDir);
             var list = new List<string>(set);
             var json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(RevealedPath, json);
+            File.WriteAllText(RevealedPath, json, new System.Text.UTF8Encoding(false));
         }
         catch (Exception ex)
         {
@@ -137,7 +145,7 @@ public static class NightMarketHelper
                     Offers = offers
                 };
                 var json = JsonSerializer.Serialize(container, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(SavedPath, json);
+                File.WriteAllText(SavedPath, json, new System.Text.UTF8Encoding(false));
             }
             catch (Exception ex)
             {
@@ -154,20 +162,28 @@ public static class NightMarketHelper
             {
                 if (File.Exists(SavedPath))
                 {
-                    var json = File.ReadAllText(SavedPath);
-                    var container = JsonSerializer.Deserialize<SavedNightMarketContainer>(json);
-                    if (container?.Offers != null && container.Offers.Count > 0)
+                    var json = File.ReadAllText(SavedPath).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
                     {
-                        var revealedSet = GetRevealedSet();
-                        foreach (var off in container.Offers)
+                        var options = new JsonSerializerOptions
                         {
-                            off.IsNightMarket = true;
-                            if (off.OfferId != Guid.Empty)
+                            PropertyNameCaseInsensitive = true,
+                            AllowTrailingCommas = true
+                        };
+                        var container = JsonSerializer.Deserialize<SavedNightMarketContainer>(json, options);
+                        if (container?.Offers != null && container.Offers.Count > 0)
+                        {
+                            var revealedSet = GetRevealedSet();
+                            foreach (var off in container.Offers)
                             {
-                                off.IsRevealed = revealedSet.Contains(off.OfferId.ToString());
+                                off.IsNightMarket = true;
+                                if (off.OfferId != Guid.Empty)
+                                {
+                                    off.IsRevealed = revealedSet.Contains(off.OfferId.ToString());
+                                }
                             }
+                            return container.Offers;
                         }
-                        return container.Offers;
                     }
                 }
             }

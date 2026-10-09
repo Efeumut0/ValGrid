@@ -323,8 +323,33 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Header Quick Stat Badges -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Header Quick Stat Badges (Responsive Horizontal ScrollViewer) -->
+                    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                  Focusable="False" PanningMode="HorizontalOnly" ClipToBounds="True">
+                        <ScrollViewer.Resources>
+                            <Style TargetType="ScrollBar">
+                                <Setter Property="Height" Value="2.5" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ScrollBar">
+                                            <Track x:Name="PART_Track" IsDirectionReversed="False">
+                                                <Track.Thumb>
+                                                    <Thumb>
+                                                        <Thumb.Template>
+                                                            <ControlTemplate TargetType="Thumb">
+                                                                <Border Background="#33507a" CornerRadius="1" />
+                                                            </ControlTemplate>
+                                                        </Thumb.Template>
+                                                    </Thumb>
+                                                </Track.Thumb>
+                                            </Track>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ScrollViewer.Resources>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0">
                         <!-- Total Players Pill -->
                         <Border Background="#161c2e" CornerRadius="10" Padding="12,6" Margin="0,0,8,0"
                                 BorderBrush="#2e3b5e" BorderThickness="1.2">
@@ -400,6 +425,7 @@
                             </StackPanel>
                         </Border>
                     </StackPanel>
+                    </ScrollViewer>
 
                     <!-- Close Button (✕ KAPAT) -->
                     <Button Grid.Column="2" Click="Close_Click"

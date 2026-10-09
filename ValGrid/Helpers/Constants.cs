@@ -40,6 +40,7 @@ public static class Constants
     public static string Region { get; set; }
     public static string Shard { get; set; }
     public static string Version { get; set; }
+    public const string AppVersion = "1.4.08";
     public static string LocalAppDataPath { get; set; }
     public static Guid Ppuuid { get; set; }
     public static Guid PPartyId { get; set; }

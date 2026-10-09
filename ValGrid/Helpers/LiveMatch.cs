@@ -27,6 +27,13 @@ public class LiveMatch
     public string QueueId { get; set; }
     public string Status { get; set; }
 
+    private static readonly object StaticCacheLock = new();
+    private static Dictionary<int, string> _cachedRankNames;
+    private static Dictionary<Guid, ValNameImage> _cachedSkins;
+    private static Dictionary<Guid, ValCard> _cachedCards;
+    private static Dictionary<Guid, ValNameImage> _cachedSprays;
+    private static Dictionary<Guid, ValNameImage> _cachedBuddies;
+
     private static async Task<bool> CheckAndSetLiveMatchIdAsync()
     {
         var client = new RestClient(
@@ -782,9 +789,21 @@ public class LiveMatch
             string tierName = "Derecesiz";
             try
             {
-                var rankNames = JsonSerializer.Deserialize<Dictionary<int, string>>(
-                    await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\competitivetiers.json").ConfigureAwait(false)
-                );
+                Dictionary<int, string> rankNames;
+                lock (StaticCacheLock) { rankNames = _cachedRankNames; }
+                if (rankNames == null)
+                {
+                    var compPath = Constants.LocalAppDataPath + "\\ValAPI\\competitivetiers.json";
+                    if (File.Exists(compPath))
+                    {
+                        var json = (await File.ReadAllTextAsync(compPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                        if (!string.IsNullOrWhiteSpace(json))
+                        {
+                            rankNames = JsonSerializer.Deserialize<Dictionary<int, string>>(json);
+                            lock (StaticCacheLock) { _cachedRankNames = rankNames; }
+                        }
+                    }
+                }
                 if (rankNames != null && rankNames.TryGetValue(compTier, out var name))
                     tierName = name;
             }
@@ -953,8 +972,9 @@ public class LiveMatch
                         : Constants.LocalAppDataPath) + "\\ValAPI\\agents.json";
                     if (File.Exists(p))
                     {
-                        var json = File.ReadAllText(p);
-                        _agentsCache = JsonSerializer.Deserialize<Dictionary<Guid, string>>(json);
+                        var json = File.ReadAllText(p).Trim().Trim('\uFEFF', '\u200B');
+                        if (!string.IsNullOrWhiteSpace(json))
+                            _agentsCache = JsonSerializer.Deserialize<Dictionary<Guid, string>>(json);
                     }
                 }
                 _agentsCache?.TryGetValue(agentid, out agentName);
@@ -994,17 +1014,22 @@ public class LiveMatch
         {
             try
             {
-                var cards = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(
-                    await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\cards.json")
-                        .ConfigureAwait(false)
-                );
-                if (cards != null && cards.TryGetValue(cardid, out var card) && card != null && card.Image != null)
+                var cardsPath = Constants.LocalAppDataPath + "\\ValAPI\\cards.json";
+                if (File.Exists(cardsPath))
                 {
-                    return new IdentityData
+                    var json = (await File.ReadAllTextAsync(cardsPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
                     {
-                        Image = card.Image,
-                        Name = Resources.Player + " " + (index + 1)
-                    };
+                        var cards = JsonSerializer.Deserialize<Dictionary<Guid, ValCard>>(json);
+                        if (cards != null && cards.TryGetValue(cardid, out var card) && card != null && card.Image != null)
+                        {
+                            return new IdentityData
+                            {
+                                Image = card.Image,
+                                Name = Resources.Player + " " + (index + 1)
+                            };
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -1155,52 +1180,87 @@ public class LiveMatch
         Dictionary<Guid, ValNameImage> sprays = null;
         Dictionary<Guid, ValNameImage> skins = null;
         Dictionary<Guid, ValNameImage> buddies = null;
-        try
+
+        lock (StaticCacheLock)
         {
-            skins = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(
-                await File.ReadAllTextAsync(
-                        Constants.LocalAppDataPath + "\\ValAPI\\skinchromas.json"
-                    )
-                    .ConfigureAwait(false)
-            );
-            cards = JsonSerializer.Deserialize<Dictionary<Guid, ValCard>>(
-                await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\cards.json")
-                    .ConfigureAwait(false)
-            );
-            sprays = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(
-                await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\sprays.json")
-                    .ConfigureAwait(false)
-            );
-            if (File.Exists(Constants.LocalAppDataPath + "\\ValAPI\\buddies.json"))
+            skins = _cachedSkins;
+            cards = _cachedCards;
+            sprays = _cachedSprays;
+            buddies = _cachedBuddies;
+        }
+
+        if (skins == null || cards == null || sprays == null)
+        {
+            try
             {
-                buddies = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(
-                    await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\buddies.json")
-                        .ConfigureAwait(false)
-                );
-            }
-            if (File.Exists(Constants.LocalAppDataPath + "\\ValAPI\\flex.json"))
-            {
-                try
+                var basePath = Constants.LocalAppDataPath + "\\ValAPI";
+                var chromasPath = basePath + "\\skinchromas.json";
+                var cardsPath = basePath + "\\cards.json";
+                var spraysPath = basePath + "\\sprays.json";
+                var buddiesPath = basePath + "\\buddies.json";
+                var flexPath = basePath + "\\flex.json";
+
+                if (skins == null && File.Exists(chromasPath))
                 {
-                    var flexDict = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(
-                        await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\flex.json")
-                            .ConfigureAwait(false)
-                    );
-                    if (flexDict != null)
+                    var json = (await File.ReadAllTextAsync(chromasPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                        skins = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                }
+
+                if (cards == null && File.Exists(cardsPath))
+                {
+                    var json = (await File.ReadAllTextAsync(cardsPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                        cards = JsonSerializer.Deserialize<Dictionary<Guid, ValCard>>(json);
+                }
+
+                if (sprays == null && File.Exists(spraysPath))
+                {
+                    var json = (await File.ReadAllTextAsync(spraysPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                        sprays = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                }
+
+                if (buddies == null && File.Exists(buddiesPath))
+                {
+                    var json = (await File.ReadAllTextAsync(buddiesPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                        buddies = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                }
+
+                if (File.Exists(flexPath))
+                {
+                    try
                     {
-                        sprays ??= new Dictionary<Guid, ValNameImage>();
-                        foreach (var kvp in flexDict)
+                        var json = (await File.ReadAllTextAsync(flexPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                        if (!string.IsNullOrWhiteSpace(json))
                         {
-                            sprays[kvp.Key] = kvp.Value;
+                            var flexDict = JsonSerializer.Deserialize<Dictionary<Guid, ValNameImage>>(json);
+                            if (flexDict != null)
+                            {
+                                sprays ??= new Dictionary<Guid, ValNameImage>();
+                                foreach (var kvp in flexDict)
+                                {
+                                    sprays[kvp.Key] = kvp.Value;
+                                }
+                            }
                         }
                     }
+                    catch { }
                 }
-                catch { }
+
+                lock (StaticCacheLock)
+                {
+                    _cachedSkins = skins;
+                    _cachedCards = cards;
+                    _cachedSprays = sprays;
+                    _cachedBuddies = buddies;
+                }
             }
-        }
-        catch (Exception e)
-        {
-            Constants.Log.Error("GetSkinInfoAsync failed: {e}", e);
+            catch (Exception e)
+            {
+                Constants.Log.Error("GetSkinInfoAsync failed: {e}", e);
+            }
         }
 
         ValNameImage defNI = new();
@@ -1787,30 +1847,42 @@ public class LiveMatch
 
         try
         {
-            var rankNames = JsonSerializer.Deserialize<Dictionary<int, string>>(
-                await File.ReadAllTextAsync(
-                        Constants.LocalAppDataPath + "\\ValAPI\\competitivetiers.json"
-                    )
-                    .ConfigureAwait(false)
-            );
-
-            for (int i = 0; i < ranks.Length; i++)
+            Dictionary<int, string> rankNames;
+            lock (StaticCacheLock) { rankNames = _cachedRankNames; }
+            if (rankNames == null)
             {
-                rankNames.TryGetValue(ranks[i], out var rank);
-                rankData.RankImages[i] = new Uri(
-                    Constants.LocalAppDataPath + $"\\ValAPI\\ranksimg\\{ranks[i]}.png"
-                );
-                rankData.RankNames[i] = rank;
+                var compPath = Constants.LocalAppDataPath + "\\ValAPI\\competitivetiers.json";
+                if (File.Exists(compPath))
+                {
+                    var json = (await File.ReadAllTextAsync(compPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                        rankNames = JsonSerializer.Deserialize<Dictionary<int, string>>(json);
+                        lock (StaticCacheLock) { _cachedRankNames = rankNames; }
+                    }
+                }
             }
 
-            rankNames.TryGetValue(peakTier, out var peakName);
-            peakName ??= "UNRATED";
-            rankData.PeakRankImage = new Uri(
-                Constants.LocalAppDataPath + $"\\ValAPI\\ranksimg\\{peakTier}.png"
-            );
-            rankData.PeakRankName = peakName;
-            rankData.PeakRankTooltip =
-                peakTier > 0 && peakRr > 0 ? $"Peak: {peakName} ({peakRr} RR)" : $"Peak: {peakName}";
+            if (rankNames != null)
+            {
+                for (int i = 0; i < ranks.Length; i++)
+                {
+                    rankNames.TryGetValue(ranks[i], out var rank);
+                    rankData.RankImages[i] = new Uri(
+                        Constants.LocalAppDataPath + $"\\ValAPI\\ranksimg\\{ranks[i]}.png"
+                    );
+                    rankData.RankNames[i] = rank;
+                }
+
+                rankNames.TryGetValue(peakTier, out var peakName);
+                peakName ??= "UNRATED";
+                rankData.PeakRankImage = new Uri(
+                    Constants.LocalAppDataPath + $"\\ValAPI\\ranksimg\\{peakTier}.png"
+                );
+                rankData.PeakRankName = peakName;
+                rankData.PeakRankTooltip =
+                    peakTier > 0 && peakRr > 0 ? $"Peak: {peakName} ({peakRr} RR)" : $"Peak: {peakName}";
+            }
         }
         catch (Exception e)
         {
@@ -2041,14 +2113,13 @@ public class LiveMatch
 
             if (string.IsNullOrEmpty(gameModeName) && File.Exists(Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json"))
             {
-                var gamemodes = JsonSerializer.Deserialize<Dictionary<Guid, string>>(
-                    await File.ReadAllTextAsync(
-                            Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json"
-                        )
-                        .ConfigureAwait(false)
-                );
-                if (gamemodes != null && gamemodes.TryGetValue(gameModeId, out var gamemode))
-                    MatchInfo.GameMode = gamemode;
+                var gmJson = (await File.ReadAllTextAsync(Constants.LocalAppDataPath + "\\ValAPI\\gamemode.json").ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(gmJson))
+                {
+                    var gamemodes = JsonSerializer.Deserialize<Dictionary<Guid, string>>(gmJson);
+                    if (gamemodes != null && gamemodes.TryGetValue(gameModeId, out var gamemode))
+                        MatchInfo.GameMode = gamemode;
+                }
             }
 
             if (File.Exists(Constants.LocalAppDataPath + $"\\ValAPI\\gamemodeimg\\{gameModeId}.png"))

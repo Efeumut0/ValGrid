@@ -5,9 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              x:Name="Self"
              mc:Ignorable="d"
+             UseLayoutRounding="True" SnapsToDevicePixels="True"
+             RenderOptions.BitmapScalingMode="HighQuality"
+             RenderOptions.EdgeMode="Aliased"
              d:DesignHeight="450" d:DesignWidth="800">
-	<Grid Margin="6">
-		<Border Background="#181E34" CornerRadius="18" Padding="12"
+	<Grid Margin="4" UseLayoutRounding="True" SnapsToDevicePixels="True">
+		<Border Background="#181E34" CornerRadius="12" Padding="8,4"
 		        BorderBrush="{Binding BorderBrush, ElementName=Self}"
 		        BorderThickness="{Binding BorderThickness, ElementName=Self}">
 			<Border.Effect>
@@ -19,12 +22,10 @@
 			<Image Source="{Binding Image, ElementName=Self}"
 			       Stretch="Uniform"
 			       RenderOptions.BitmapScalingMode="HighQuality"
+			       RenderOptions.EdgeMode="Aliased"
+			       UseLayoutRounding="True" SnapsToDevicePixels="True"
 			       ToolTip="{Binding TooltipName, ElementName=Self}"
-			       ToolTipService.InitialShowDelay="0">
-				<Image.Effect>
-					<DropShadowEffect BlurRadius="4" ShadowDepth="2" Color="Black" Opacity="0.4" />
-				</Image.Effect>
-			</Image>
+			       ToolTipService.InitialShowDelay="0" />
 		</Border>
 		<!-- Rare Star Indicator Badge -->
 		<Border Visibility="{Binding StarVisibility, ElementName=Self}"
@@ -35,22 +36,24 @@
 			<TextBlock Text="⭐" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center" />
 		</Border>
 
-		<!-- Gun Buddy (Uğurluk) in bottom-left corner (1.7x enlarged to 78x78) -->
+		<!-- Gun Buddy (Uğurluk) in bottom-left corner (Dengeli ve net görünür boyut: 50x50) -->
 		<Border Visibility="{Binding BuddyVisibility, ElementName=Self}"
 		        HorizontalAlignment="Left" VerticalAlignment="Bottom"
-		        Margin="8,0,0,8"
-		        Background="#F0101426" CornerRadius="14"
-		        BorderBrush="#556987" BorderThickness="1.8"
-		        Padding="4" Width="78" Height="78"
+		        Margin="6,0,0,6"
+		        Background="#F0101426" CornerRadius="8"
+		        BorderBrush="#556987" BorderThickness="1.2"
+		        Padding="3" Width="50" Height="50"
 		        Cursor="Hand"
 		        ToolTip="{Binding BuddyName, ElementName=Self}"
 		        ToolTipService.InitialShowDelay="0">
 			<Border.Effect>
-				<DropShadowEffect BlurRadius="10" ShadowDepth="4" Color="Black" Opacity="0.85" />
+				<DropShadowEffect BlurRadius="4" ShadowDepth="2" Color="Black" Opacity="0.75" />
 			</Border.Effect>
 			<Image Source="{Binding BuddyImage, ElementName=Self}"
 			       Stretch="Uniform"
-			       RenderOptions.BitmapScalingMode="HighQuality" />
+			       RenderOptions.BitmapScalingMode="HighQuality"
+			       RenderOptions.EdgeMode="Aliased"
+			       UseLayoutRounding="True" SnapsToDevicePixels="True" />
 		</Border>
 	</Grid>
 </UserControl>

@@ -230,8 +230,8 @@ public static class SkinInspectHelper
 
     private static string ExtractCleanStyleName(string displayName, int index)
     {
-        if (index == 0) return "Standart";
-        if (string.IsNullOrWhiteSpace(displayName)) return $"Varyant {index + 1}";
+        if (index == 0) return L10n.GetDefaultVariantName();
+        if (string.IsNullOrWhiteSpace(displayName)) return L10n.IsEnglish ? $"Variant {index + 1}" : $"Varyant {index + 1}";
 
         if (displayName.Contains('\n'))
         {
@@ -239,7 +239,9 @@ public static class SkinInspectHelper
             if (parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
             {
                 var s = parts[1].Trim().Trim('(', ')');
-                if (s.StartsWith("Stil", StringComparison.OrdinalIgnoreCase))
+                if (s.StartsWith("Stil", StringComparison.OrdinalIgnoreCase) ||
+                    s.StartsWith("Style", StringComparison.OrdinalIgnoreCase) ||
+                    s.StartsWith("Variant", StringComparison.OrdinalIgnoreCase))
                 {
                     var dashIdx = s.IndexOf('-');
                     if (dashIdx >= 0 && dashIdx + 1 < s.Length)
@@ -260,7 +262,7 @@ public static class SkinInspectHelper
             return sub;
         }
 
-        return $"Varyant {index + 1}";
+        return L10n.IsEnglish ? $"Variant {index + 1}" : $"Varyant {index + 1}";
     }
 
     private static string CleanSkinName(string name)
@@ -281,7 +283,7 @@ public static class SkinInspectHelper
 
     private static string _cachedLanguage;
 
-    private static async Task<JsonElement?> EnsureSkinsDataAsync()
+    public static async Task<JsonElement?> EnsureSkinsDataAsync()
     {
         var activeLang = L10n.ValApiLanguage;
         lock (CacheLock)
@@ -300,7 +302,7 @@ public static class SkinInspectHelper
                 var fi = new FileInfo(localPath);
                 if ((DateTime.UtcNow - fi.LastWriteTimeUtc).TotalDays < 3)
                 {
-                    var text = await File.ReadAllTextAsync(localPath).ConfigureAwait(false);
+                    var text = (await File.ReadAllTextAsync(localPath).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
                     using var doc = JsonDocument.Parse(text);
                     if (doc.RootElement.TryGetProperty("data", out var data))
                     {

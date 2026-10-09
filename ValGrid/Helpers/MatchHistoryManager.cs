@@ -36,7 +36,7 @@ public static class MatchHistoryManager
             {
                 if (File.Exists(FilePath))
                 {
-                    var json = File.ReadAllText(FilePath);
+                    var json = File.ReadAllText(FilePath).Trim().Trim('\uFEFF', '\u200B');
                     if (json.Contains("AppData/Local/NOWT") || json.Contains("AppData/Local/ValPulse") ||
                         json.Contains("AppData\\Local\\NOWT") || json.Contains("AppData\\Local\\ValPulse"))
                     {
@@ -44,23 +44,42 @@ public static class MatchHistoryManager
                                    .Replace("AppData/Local/ValPulse", "AppData/Local/ValGrid")
                                    .Replace("AppData\\Local\\NOWT", "AppData\\Local\\ValGrid")
                                    .Replace("AppData\\Local\\ValPulse", "AppData\\Local\\ValGrid");
-                        try { File.WriteAllText(FilePath, json); } catch { }
+                        try { File.WriteAllText(FilePath, json, new System.Text.UTF8Encoding(false)); } catch { }
                     }
-                    var list = JsonSerializer.Deserialize<List<MatchHistoryItem>>(json);
-                    if (list != null)
+
+                    if (!string.IsNullOrWhiteSpace(json))
                     {
-                        _cachedMatches = list;
-                        if (CleanupBogusMatchesInternal(_cachedMatches))
+                        var options = new JsonSerializerOptions
                         {
-                            Save();
+                            PropertyNameCaseInsensitive = true,
+                            AllowTrailingCommas = true,
+                            ReadCommentHandling = JsonCommentHandling.Skip
+                        };
+
+                        var list = JsonSerializer.Deserialize<List<MatchHistoryItem>>(json, options);
+                        if (list != null)
+                        {
+                            _cachedMatches = list;
+                            if (CleanupBogusMatchesInternal(_cachedMatches))
+                            {
+                                Save();
+                            }
+                            return _cachedMatches;
                         }
-                        return _cachedMatches;
                     }
                 }
             }
             catch (Exception ex)
             {
                 Constants.Log?.Error("MatchHistoryManager.GetMatches load failed: {e}", ex);
+                try
+                {
+                    if (File.Exists(FilePath) && new FileInfo(FilePath).Length > 0)
+                    {
+                        File.Copy(FilePath, FilePath + ".corrupt.bak", true);
+                    }
+                }
+                catch { }
             }
 
             _cachedMatches = new List<MatchHistoryItem>();
@@ -189,7 +208,7 @@ public static class MatchHistoryManager
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
-                File.WriteAllText(FilePath, json);
+                File.WriteAllText(FilePath, json, new System.Text.UTF8Encoding(false));
             }
             catch (Exception ex)
             {
@@ -938,7 +957,7 @@ public static class MatchHistoryManager
                     "ValAPI", "cards.json");
                 if (File.Exists(path))
                 {
-                    var json = File.ReadAllText(path);
+                    var json = File.ReadAllText(path).Trim().Trim('\uFEFF', '\u200B');
                     using var doc = JsonDocument.Parse(json);
                     _cardNameCache = new Dictionary<Guid, string>();
                     foreach (var prop in doc.RootElement.EnumerateObject())

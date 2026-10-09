@@ -11,7 +11,7 @@
 	<UserControl.Resources>
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 	</UserControl.Resources>
-	<Grid Visibility="{Binding Overlay.IsBusy, ElementName=Self, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}">
+	<Grid Background="#70090D18" Visibility="{Binding Overlay.IsBusy, ElementName=Self, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}">
 		<Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="Auto" Height="Auto"
 		        Background="#252A40" Padding="10px"
 		        CornerRadius="20">

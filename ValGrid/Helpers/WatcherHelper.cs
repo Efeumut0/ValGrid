@@ -71,7 +71,7 @@ public static class WatcherHelper
             // 1. Check flag file if exists
             if (File.Exists(FlagFilePath))
             {
-                var content = File.ReadAllText(FlagFilePath).Trim();
+                var content = File.ReadAllText(FlagFilePath).Trim().Trim('\uFEFF', '\u200B');
                 if (content == "1") return true;
                 if (content == "0") return false;
             }

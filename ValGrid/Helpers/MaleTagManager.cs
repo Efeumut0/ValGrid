@@ -61,8 +61,44 @@ public static class MaleTagManager
         {
             if (File.Exists(FilePath))
             {
-                var json = File.ReadAllText(FilePath);
-                _entries = JsonSerializer.Deserialize<List<MaleTagEntry>>(json) ?? new List<MaleTagEntry>();
+                var json = File.ReadAllText(FilePath).Trim().Trim('\uFEFF', '\u200B');
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        AllowTrailingCommas = true,
+                        ReadCommentHandling = JsonCommentHandling.Skip
+                    };
+
+                    try
+                    {
+                        _entries = JsonSerializer.Deserialize<List<MaleTagEntry>>(json, options) ?? new List<MaleTagEntry>();
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            var dict = JsonSerializer.Deserialize<Dictionary<string, MaleTagEntry>>(json, options);
+                            if (dict != null)
+                                _entries = dict.Values.ToList();
+                            else
+                                _entries = new List<MaleTagEntry>();
+                        }
+                        catch
+                        {
+                            var single = JsonSerializer.Deserialize<MaleTagEntry>(json, options);
+                            if (single != null && (!string.IsNullOrEmpty(single.Puuid) || !string.IsNullOrEmpty(single.Username)))
+                                _entries = new List<MaleTagEntry> { single };
+                            else
+                                throw;
+                        }
+                    }
+                }
+                else
+                {
+                    _entries = new List<MaleTagEntry>();
+                }
             }
             else
             {
@@ -72,6 +108,14 @@ public static class MaleTagManager
         catch (Exception e)
         {
             Constants.Log?.Error("MaleTagManager load failed: {e}", e);
+            try
+            {
+                if (File.Exists(FilePath) && new FileInfo(FilePath).Length > 0)
+                {
+                    File.Copy(FilePath, FilePath + ".corrupt.bak", true);
+                }
+            }
+            catch { }
             _entries = new List<MaleTagEntry>();
         }
 
@@ -110,7 +154,7 @@ public static class MaleTagManager
                 Directory.CreateDirectory(dir);
 
             var json = JsonSerializer.Serialize(_entries, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(FilePath, json);
+            File.WriteAllText(FilePath, json, new System.Text.UTF8Encoding(false));
         }
         catch (Exception e)
         {

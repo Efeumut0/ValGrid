@@ -24,6 +24,7 @@ public partial class Info : UserControl
             if (InfoHomeBtn != null) InfoHomeBtn.ToolTip = L10n.Get("HomeTitle");
             if (InfoSettingsBtn != null) InfoSettingsBtn.ToolTip = L10n.Get("NavSettingsTooltip");
             if (InfoAppSubtitleText != null) InfoAppSubtitleText.Text = L10n.Get("InfoAppSubtitle");
+            if (InfoVersionText != null) InfoVersionText.Text = Constants.AppVersion;
         }
         catch (Exception ex)
         {

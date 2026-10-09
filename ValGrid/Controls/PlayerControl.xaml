@@ -36,18 +36,6 @@
 			<Setter Property="ToolTipService.InitialShowDelay" Value="0" />
 			<Setter Property="HasDropShadow" Value="False" />
 		</Style>
-		<Storyboard x:Key="expandStoryboard">
-			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-			                 To="1.02" Duration="0:0:0.1" />
-			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-			                 To="1.02" Duration="0:0:0.1" />
-		</Storyboard>
-		<Storyboard x:Key="shrinkStoryboard">
-			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-			                 To="1" Duration="0:0:0.1" />
-			<DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-			                 To="1" Duration="0:0:0.1" />
-		</Storyboard>
 	</UserControl.Resources>
 
 	<Border
@@ -107,52 +95,64 @@
 				</Border>
 			</Grid>
 
-			<!-- Ajan adi + kullanici adi ayni satirda (yan yana) -> alt satir silaha kaldi -->
-			<Viewbox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Margin="0,0,75,0">
-				<StackPanel Orientation="Horizontal" MouseRightButtonUp="PlayerName_RightClick" Cursor="Hand"
-				            ToolTip="Sol Tık: Tracker Profilini Aç | Sağ Tık: İsmi Kopyala" ToolTipService.InitialShowDelay="0">
-					<TextBlock
-						Background="Transparent"
-						FontFamily="{StaticResource Nunito}"
-						FontWeight="Bold"
-						Foreground="#32e2b2"
-						VerticalAlignment="Center"
-						Margin="0,0,14,0"
-						Text="{Binding PlayerCell.IdentityData.Name, ElementName=Self}" />
-					<TextBox
-						Background="Transparent"
-						FontFamily="{StaticResource Nunito}"
-						BorderThickness="0"
-						FontWeight="Normal"
-						Foreground="#9f97b0"
-						VerticalAlignment="Center"
-						IsReadOnly="True"
-						ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
-						ToolTipService.InitialShowDelay="0"
-						Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}"
-						Visibility="{Binding PlayerCell.IgnData.TrackerDisabled, ElementName=Self}" />
-					<TextBlock
-						FontWeight="Normal"
-						Foreground="#9f97b0"
-						VerticalAlignment="Center"
-						ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
-						ToolTipService.InitialShowDelay="0"
-						Visibility="{Binding PlayerCell.IgnData.TrackerEnabled, ElementName=Self}">
-						<Hyperlink
-							NavigateUri="{Binding PlayerCell.IgnData.TrackerUri, ElementName=Self}"
-							RequestNavigate="HandleLinkClick"
-							MouseRightButtonUp="PlayerName_RightClick"
-							TextDecorations="">
-							<Hyperlink.Inlines>
-								<Run Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}" />
-							</Hyperlink.Inlines>
-						</Hyperlink>
-					</TextBlock>
-				</StackPanel>
-			</Viewbox>
+			<!-- Row 0: Sol tarafta Ajan & Oyuncu Adi (genis alan), Sag tarafta Rozetler -->
+			<Grid Grid.Row="0" Grid.Column="1" Margin="0,0,6,0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 
-			<!-- Header Badges: Inventory Value & Encounter badge -->
-			<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
+				<!-- Ajan adi + kullanici adi (Sol Sutun - genis ve ferah) -->
+				<Viewbox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" StretchDirection="DownOnly" MaxHeight="28">
+					<StackPanel Orientation="Horizontal" MouseRightButtonUp="PlayerName_RightClick" Cursor="Hand"
+					            ToolTip="Sol Tık: Tracker Profilini Aç | Sağ Tık: İsmi Kopyala" ToolTipService.InitialShowDelay="0">
+						<TextBlock
+							Background="Transparent"
+							FontFamily="{StaticResource Nunito}"
+							FontWeight="Bold"
+							Foreground="#32e2b2"
+							VerticalAlignment="Center"
+							Margin="0,0,10,0"
+							FontSize="15"
+							Text="{Binding PlayerCell.IdentityData.Name, ElementName=Self}" />
+						<TextBox
+							Background="Transparent"
+							FontFamily="{StaticResource Nunito}"
+							BorderThickness="0"
+							FontWeight="Normal"
+							Foreground="#9f97b0"
+							VerticalAlignment="Center"
+							IsReadOnly="True"
+							Focusable="False"
+							Cursor="Hand"
+							FontSize="15"
+							ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
+							ToolTipService.InitialShowDelay="0"
+							Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}"
+							Visibility="{Binding PlayerCell.IgnData.TrackerDisabled, ElementName=Self}" />
+						<TextBlock
+							FontWeight="Normal"
+							Foreground="#9f97b0"
+							VerticalAlignment="Center"
+							FontSize="15"
+							ToolTip="{Binding PlayerCell.IgnData.Tooltip, ElementName=Self}"
+							ToolTipService.InitialShowDelay="0"
+							Visibility="{Binding PlayerCell.IgnData.TrackerEnabled, ElementName=Self}">
+							<Hyperlink
+								NavigateUri="{Binding PlayerCell.IgnData.TrackerUri, ElementName=Self}"
+								RequestNavigate="HandleLinkClick"
+								MouseRightButtonUp="PlayerName_RightClick"
+								TextDecorations="">
+								<Hyperlink.Inlines>
+									<Run Text="{Binding PlayerCell.IgnData.Username, ElementName=Self}" />
+								</Hyperlink.Inlines>
+							</Hyperlink>
+						</TextBlock>
+					</StackPanel>
+				</Viewbox>
+
+				<!-- Header Badges: Inventory Value, Encounter, Cinsiyet & Engel Butonlari (Sag Sutun) -->
+				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="6,0,0,0">
 				<!-- Female / Kadın Simgesi Butonu -->
 				<Border x:Name="FemaleBtn"
 				        Width="38" Height="32"
@@ -508,6 +508,7 @@
 				</Popup>
 			</Grid>
 		</StackPanel>
+			</Grid>
 			<!-- (Kullanici adi Row 0'a, ajan adinin yanina tasindi) -->
 
 
@@ -535,39 +536,50 @@
 			<!-- 	HorizontalAlignment="Left" -->
 			<!-- 	VerticalAlignment="Bottom" -->
 			<!-- 	Stretch="Uniform"> -->
-			<Border Background="#4c5b6e" CornerRadius="10" Padding="7"
+			<Border CornerRadius="10" Padding="7"
 			        Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Stretch"
-			        HorizontalAlignment="Stretch" Margin="0,4,10,0" RenderTransformOrigin="0.5,0.5"
-			        Grid.Column="1" MouseLeftButtonUp="ButtonUpHandler"
+			        HorizontalAlignment="Stretch" Margin="0,4,10,0"
+			        Grid.Column="1" MouseLeftButtonUp="ButtonUpHandler" Cursor="Hand"
+			        UseLayoutRounding="True" SnapsToDevicePixels="True"
 			        Visibility="{Binding PlayerCell.WeaponBarVisibility, ElementName=Self}">
-				<Border.RenderTransform>
-					<ScaleTransform ScaleX="1" ScaleY="1" />
-				</Border.RenderTransform>
+				<Border.Background>
+					<SolidColorBrush x:Name="WeaponBarBg" Color="#4c5b6e" />
+				</Border.Background>
 				<Border.Triggers>
 					<EventTrigger RoutedEvent="Border.MouseEnter">
-						<BeginStoryboard Storyboard="{StaticResource expandStoryboard}" />
+						<BeginStoryboard>
+							<Storyboard>
+								<ColorAnimation Storyboard.TargetName="WeaponBarBg"
+								                Storyboard.TargetProperty="Color"
+								                To="#5d6f85" Duration="0:0:0.1" />
+							</Storyboard>
+						</BeginStoryboard>
 					</EventTrigger>
 					<EventTrigger RoutedEvent="Border.MouseLeave">
-						<BeginStoryboard Storyboard="{StaticResource shrinkStoryboard}" />
+						<BeginStoryboard>
+							<Storyboard>
+								<ColorAnimation Storyboard.TargetName="WeaponBarBg"
+								                Storyboard.TargetProperty="Color"
+								                To="#4c5b6e" Duration="0:0:0.1" />
+							</Storyboard>
+						</BeginStoryboard>
 					</EventTrigger>
 				</Border.Triggers>
 				<Border.Effect>
 					<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
 				</Border.Effect>
 				<!-- 4 silah tek sirada, esit paylasim (hepsi sigar, kirpilmaz) -->
-				<UniformGrid Rows="1" Columns="4">
+				<UniformGrid Rows="1" Columns="4" SnapsToDevicePixels="True" UseLayoutRounding="True">
 					<Grid Margin="2">
 						<Border CornerRadius="6"
 						        BorderBrush="{Binding PlayerCell.SkinData.Slot1BorderBrush, ElementName=Self}"
 						        BorderThickness="{Binding PlayerCell.SkinData.Slot1BorderThickness, ElementName=Self}">
 							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       RenderOptions.EdgeMode="Aliased"
+							       UseLayoutRounding="True" SnapsToDevicePixels="True"
 							       Source="{Binding PlayerCell.SkinData.Slot1Image, ElementName=Self}"
 							       ToolTip="{Binding PlayerCell.SkinData.Slot1Tooltip, ElementName=Self}"
-							       ToolTipService.InitialShowDelay="0">
-								<Image.Effect>
-									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-								</Image.Effect>
-							</Image>
+							       ToolTipService.InitialShowDelay="0" />
 						</Border>
 						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
 						           Visibility="{Binding PlayerCell.SkinData.Slot1StarVisibility, ElementName=Self}" />
@@ -577,13 +589,11 @@
 						        BorderBrush="{Binding PlayerCell.SkinData.Slot2BorderBrush, ElementName=Self}"
 						        BorderThickness="{Binding PlayerCell.SkinData.Slot2BorderThickness, ElementName=Self}">
 							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       RenderOptions.EdgeMode="Aliased"
+							       UseLayoutRounding="True" SnapsToDevicePixels="True"
 							       Source="{Binding PlayerCell.SkinData.Slot2Image, ElementName=Self}"
 							       ToolTip="{Binding PlayerCell.SkinData.Slot2Tooltip, ElementName=Self}"
-							       ToolTipService.InitialShowDelay="0">
-								<Image.Effect>
-									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-								</Image.Effect>
-							</Image>
+							       ToolTipService.InitialShowDelay="0" />
 						</Border>
 						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
 						           Visibility="{Binding PlayerCell.SkinData.Slot2StarVisibility, ElementName=Self}" />
@@ -593,13 +603,11 @@
 						        BorderBrush="{Binding PlayerCell.SkinData.Slot3BorderBrush, ElementName=Self}"
 						        BorderThickness="{Binding PlayerCell.SkinData.Slot3BorderThickness, ElementName=Self}">
 							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       RenderOptions.EdgeMode="Aliased"
+							       UseLayoutRounding="True" SnapsToDevicePixels="True"
 							       Source="{Binding PlayerCell.SkinData.Slot3Image, ElementName=Self}"
 							       ToolTip="{Binding PlayerCell.SkinData.Slot3Tooltip, ElementName=Self}"
-							       ToolTipService.InitialShowDelay="0">
-								<Image.Effect>
-									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-								</Image.Effect>
-							</Image>
+							       ToolTipService.InitialShowDelay="0" />
 						</Border>
 						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
 						           Visibility="{Binding PlayerCell.SkinData.Slot3StarVisibility, ElementName=Self}" />
@@ -609,13 +617,11 @@
 						        BorderBrush="{Binding PlayerCell.SkinData.Slot4BorderBrush, ElementName=Self}"
 						        BorderThickness="{Binding PlayerCell.SkinData.Slot4BorderThickness, ElementName=Self}">
 							<Image Margin="2" RenderOptions.BitmapScalingMode="HighQuality"
+							       RenderOptions.EdgeMode="Aliased"
+							       UseLayoutRounding="True" SnapsToDevicePixels="True"
 							       Source="{Binding PlayerCell.SkinData.Slot4Image, ElementName=Self}"
 							       ToolTip="{Binding PlayerCell.SkinData.Slot4Tooltip, ElementName=Self}"
-							       ToolTipService.InitialShowDelay="0">
-								<Image.Effect>
-									<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-								</Image.Effect>
-							</Image>
+							       ToolTipService.InitialShowDelay="0" />
 						</Border>
 						<TextBlock Text="⭐" FontSize="10" Foreground="#ffd700" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
 						           Visibility="{Binding PlayerCell.SkinData.Slot4StarVisibility, ElementName=Self}" />
@@ -691,29 +697,18 @@
 				<Image
 					Source="{Binding PlayerCell.RankData.RankImages[3], ElementName=Self}"
 					ToolTip="{Binding PlayerCell.RankData.RankNames[3], ElementName=Self}"
-					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
-					<Image.Effect>
-						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-					</Image.Effect>
-				</Image>
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality"
+					RenderOptions.EdgeMode="Aliased" SnapsToDevicePixels="True" />
 				<Image
-
 					Source="{Binding PlayerCell.RankData.RankImages[2], ElementName=Self}"
 					ToolTip="{Binding PlayerCell.RankData.RankNames[2], ElementName=Self}"
-					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
-					<Image.Effect>
-						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-					</Image.Effect>
-				</Image>
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality"
+					RenderOptions.EdgeMode="Aliased" SnapsToDevicePixels="True" />
 				<Image
 					Source="{Binding PlayerCell.RankData.RankImages[1], ElementName=Self}"
 					ToolTip="{Binding PlayerCell.RankData.RankNames[1], ElementName=Self}"
-					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality">
-					<Image.Effect>
-						<DropShadowEffect BlurRadius="5" ShadowDepth="3" />
-					</Image.Effect>
-				</Image>
-
+					ToolTipService.InitialShowDelay="0" RenderOptions.BitmapScalingMode="HighQuality"
+					RenderOptions.EdgeMode="Aliased" SnapsToDevicePixels="True" />
 			</UniformGrid>
 
 			<UniformGrid
@@ -814,7 +809,7 @@
 					Value="{Binding PlayerCell.MatchHistoryData.RankProgress, ElementName=Self}" />
 			</Border>
 
-			<Grid Grid.RowSpan="3" Grid.Row="0" Grid.Column="3" Margin="-15">
+			<Grid Grid.RowSpan="3" Grid.Row="0" Grid.Column="3" Margin="0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="4*" />
 					<ColumnDefinition Width="1*" />

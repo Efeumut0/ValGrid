@@ -1132,7 +1132,7 @@ public static class ValApi
         {
             try
             {
-                var json = await File.ReadAllTextAsync(path).ConfigureAwait(false);
+                var json = (await File.ReadAllTextAsync(path).ConfigureAwait(false)).Trim().Trim('\uFEFF', '\u200B');
                 var dict = JsonSerializer.Deserialize<Dictionary<Guid, ValSkinMeta>>(json);
                 if (dict != null && dict.Count > 0)
                 {

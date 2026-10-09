@@ -7,14 +7,16 @@
 	xmlns:fa6="http://schemas.fontawesome.com/icons/fonts"
 	x:Name="Self" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 	mc:Ignorable="d" Background="Transparent"
-	d:DesignHeight="800" d:DesignWidth="1200" d:DataContext="{d:DesignData SkinData}">
+	UseLayoutRounding="True" SnapsToDevicePixels="True"
+	TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
+	d:DesignHeight="860" d:DesignWidth="1620" d:DataContext="{d:DesignData SkinData}">
 	<UserControl.Resources>
 		<Style x:Key="InventoryCopyBtnStyle" TargetType="Button">
 			<Setter Property="Background" Value="#1b2138" />
 			<Setter Property="BorderBrush" Value="#3d496c" />
 			<Setter Property="BorderThickness" Value="1.2" />
 			<Setter Property="Cursor" Value="Hand" />
-			<Setter Property="Padding" Value="9,4" />
+			<Setter Property="Padding" Value="10,5" />
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="Button">
@@ -24,9 +26,6 @@
 						        BorderThickness="{TemplateBinding BorderThickness}"
 						        CornerRadius="8"
 						        Padding="{TemplateBinding Padding}">
-							<Border.Effect>
-								<DropShadowEffect BlurRadius="6" ShadowDepth="2" Color="Black" Opacity="0.5" />
-							</Border.Effect>
 							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 						</Border>
 						<ControlTemplate.Triggers>
@@ -43,246 +42,250 @@
 			</Setter>
 		</Style>
 	</UserControl.Resources>
-	<Grid Background="#66000000" MouseLeftButtonUp="Backdrop_Click">
-		<Border Background="#252A40" CornerRadius="20" Margin="30, 20" Padding="14"
+	<Grid Background="#D80B0F1C" MouseLeftButtonUp="Backdrop_Click" SnapsToDevicePixels="True" UseLayoutRounding="True">
+		<Border Background="#252A40" CornerRadius="18" Padding="14,10"
+		        Margin="20,12"
 		        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+		        SnapsToDevicePixels="True" UseLayoutRounding="True"
 		        MouseLeftButtonUp="InnerBorder_Click">
 			<Border.Effect>
-				<DropShadowEffect BlurRadius="16" ShadowDepth="6" Color="Black" Opacity="0.6" />
+				<DropShadowEffect BlurRadius="24" ShadowDepth="8" Color="Black" Opacity="0.75" />
 			</Border.Effect>
-			<Grid>
+			<Grid UseLayoutRounding="True" SnapsToDevicePixels="True">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="120" MaxWidth="145" />
-					<ColumnDefinition Width="120" MaxWidth="145" />
+					<ColumnDefinition Width="135" />
+					<ColumnDefinition Width="135" />
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-			</Grid.RowDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
 
-			<!-- Header: Player Name + Inventory Value & Collection Badge -->
-			<StackPanel Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="0"
-			            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<TextBlock Text="{Binding Username, ElementName=Self}"
-					           FontSize="22" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"
-					           Cursor="Hand" ToolTip="Tıkla: İsmi Kopyala" ToolTipService.InitialShowDelay="0"
-					           MouseLeftButtonUp="CopyPlayerName_Click" />
-					<Button x:Name="CopySkinsBtn"
-					        Style="{StaticResource InventoryCopyBtnStyle}"
-					        Click="CopySkins_Click"
-					        PreviewMouseUp="CopySkins_PreviewMouseUp"
-					        MouseRightButtonUp="CopySkins_RightClick"
-					        Margin="12,0,0,0"
-					        VerticalAlignment="Center"
-					        ToolTip="Sol Tık: İsim ve Skinleri Kopyala&#x0a;Orta Tık: Toplam Değerli (VP &amp; TL) Kopyala&#x0a;Sağ Tık: Sadece Uğurlukları Kopyala"
-					        ToolTipService.InitialShowDelay="0">
+				<!-- Header: Player Name + Inventory Value & Collection Badge -->
+				<StackPanel Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="0"
+				            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2,4,8">
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock Text="{Binding Username, ElementName=Self}"
+						           FontSize="22" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"
+						           Cursor="Hand" ToolTip="Tıkla: İsmi Kopyala" ToolTipService.InitialShowDelay="0"
+						           MouseLeftButtonUp="CopyPlayerName_Click" />
+						<Button x:Name="CopySkinsBtn"
+						        Style="{StaticResource InventoryCopyBtnStyle}"
+						        Click="CopySkins_Click"
+						        PreviewMouseUp="CopySkins_PreviewMouseUp"
+						        MouseRightButtonUp="CopySkins_RightClick"
+						        Margin="12,0,0,0"
+						        VerticalAlignment="Center"
+						        ToolTip="Sol Tık: İsim ve Skinleri Kopyala&#x0a;Orta Tık: Toplam Değerli (VP &amp; TL) Kopyala&#x0a;Sağ Tık: Sadece Uğurlukları Kopyala"
+						        ToolTipService.InitialShowDelay="0">
+							<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+								<TextBlock x:Name="CopySkinsIcon" Text="📋" FontSize="13" VerticalAlignment="Center" Margin="0,0,5,0" />
+								<TextBlock x:Name="CopySkinsLabel" Text="Kopyala" FontFamily="{StaticResource Nunito}"
+								           FontSize="12" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+							</StackPanel>
+						</Button>
+						<Button x:Name="CopyBuddiesBtn"
+						        Style="{StaticResource InventoryCopyBtnStyle}"
+						        Click="CopyBuddies_Click"
+						        Margin="8,0,0,0"
+						        VerticalAlignment="Center"
+						        ToolTip="Sadece Takılı Uğurlukları Kopyala&#x0a;Örn: Oyuncu (Uğurluklar): RGX 11z Pro, Radyant Çiçeği..."
+						        ToolTipService.InitialShowDelay="0">
+							<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+								<TextBlock x:Name="CopyBuddiesIcon" Text="🧿" FontSize="13" VerticalAlignment="Center" Margin="0,0,5,0" />
+								<TextBlock x:Name="CopyBuddiesLabel" Text="Uğurluklar" FontFamily="{StaticResource Nunito}"
+								           FontSize="12" FontWeight="Bold" Foreground="#89B4FF" VerticalAlignment="Center" />
+							</StackPanel>
+						</Button>
+					</StackPanel>
+					<Border Background="#1b2138" CornerRadius="8" Padding="10,3" Margin="0,4,0,0"
+					        BorderBrush="#3d496c" BorderThickness="1" HorizontalAlignment="Center"
+					        ToolTip="{Binding SkinDataObject.InventorySummaryTooltip, ElementName=Self}"
+					        ToolTipService.InitialShowDelay="0"
+					        Visibility="{Binding SkinDataObject.InventoryValueVisibility, ElementName=Self}">
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-							<TextBlock x:Name="CopySkinsIcon" Text="📋" FontSize="13" VerticalAlignment="Center" Margin="0,0,5,0" />
-							<TextBlock x:Name="CopySkinsLabel" Text="Kopyala" FontFamily="{StaticResource Nunito}"
-							           FontSize="12" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+							<fa6:ImageAwesome Icon="Solid_Gem" PrimaryColor="#38bdf8" Width="12" Height="12" Margin="0,0,5,0" VerticalAlignment="Center" />
+							<TextBlock Text="{Binding SkinDataObject.TotalValueFormatted, ElementName=Self}"
+							           FontWeight="Bold" Foreground="#ffd700" FontSize="13" VerticalAlignment="Center" />
+							<TextBlock Text=" (" Foreground="#8e9bb5" FontSize="12" VerticalAlignment="Center" />
+							<TextBlock Text="{Binding SkinDataObject.TotalValueTlFormatted, ElementName=Self}"
+							           FontWeight="SemiBold" Foreground="#32e2b2" FontSize="12" VerticalAlignment="Center" />
+							<TextBlock Text=")" Foreground="#8e9bb5" FontSize="12" VerticalAlignment="Center" />
+							<TextBlock Text="  •  " Foreground="#5a6585" FontSize="12" VerticalAlignment="Center"
+							           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
+							<TextBlock Text="{Binding SkinDataObject.RareBadgeIcon, ElementName=Self}"
+							           FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center"
+							           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
+							<TextBlock Text="{Binding SkinDataObject.CollectionType, ElementName=Self}"
+							           FontWeight="SemiBold" Foreground="#ffd700" FontSize="12" VerticalAlignment="Center"
+							           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
 						</StackPanel>
-					</Button>
-					<Button x:Name="CopyBuddiesBtn"
-					        Style="{StaticResource InventoryCopyBtnStyle}"
-					        Click="CopyBuddies_Click"
-					        Margin="8,0,0,0"
-					        VerticalAlignment="Center"
-					        ToolTip="Sadece Takılı Uğurlukları Kopyala&#x0a;Örn: Oyuncu (Uğurluklar): RGX 11z Pro, Radyant Çiçeği..."
-					        ToolTipService.InitialShowDelay="0">
-						<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-							<TextBlock x:Name="CopyBuddiesIcon" Text="🧿" FontSize="13" VerticalAlignment="Center" Margin="0,0,5,0" />
-							<TextBlock x:Name="CopyBuddiesLabel" Text="Uğurluklar" FontFamily="{StaticResource Nunito}"
-							           FontSize="12" FontWeight="Bold" Foreground="#89B4FF" VerticalAlignment="Center" />
-						</StackPanel>
-					</Button>
+					</Border>
 				</StackPanel>
-				<Border Background="#1b2138" CornerRadius="8" Padding="10,3" Margin="0,4,0,0"
-				        BorderBrush="#3d496c" BorderThickness="1" HorizontalAlignment="Center"
-				        ToolTip="{Binding SkinDataObject.InventorySummaryTooltip, ElementName=Self}"
-				        ToolTipService.InitialShowDelay="0"
-				        Visibility="{Binding SkinDataObject.InventoryValueVisibility, ElementName=Self}">
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<fa6:ImageAwesome Icon="Solid_Gem" PrimaryColor="#38bdf8" Width="12" Height="12" Margin="0,0,5,0" VerticalAlignment="Center" />
-						<TextBlock Text="{Binding SkinDataObject.TotalValueFormatted, ElementName=Self}"
-						           FontWeight="Bold" Foreground="#ffd700" FontSize="13" VerticalAlignment="Center" />
-						<TextBlock Text=" (" Foreground="#8e9bb5" FontSize="12" VerticalAlignment="Center" />
-						<TextBlock Text="{Binding SkinDataObject.TotalValueTlFormatted, ElementName=Self}"
-						           FontWeight="SemiBold" Foreground="#32e2b2" FontSize="12" VerticalAlignment="Center" />
-						<TextBlock Text=")" Foreground="#8e9bb5" FontSize="12" VerticalAlignment="Center" />
-						<TextBlock Text="  •  " Foreground="#5a6585" FontSize="12" VerticalAlignment="Center"
-						           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
-						<TextBlock Text="{Binding SkinDataObject.RareBadgeIcon, ElementName=Self}"
-						           FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center"
-						           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
-						<TextBlock Text="{Binding SkinDataObject.CollectionType, ElementName=Self}"
-						           FontWeight="SemiBold" Foreground="#ffd700" FontSize="12" VerticalAlignment="Center"
-						           Visibility="{Binding SkinDataObject.RareBadgeVisibility, ElementName=Self}" />
+
+				<!-- Sağ Üst Köşe Kapat Butonu -->
+				<Button
+					Grid.Row="0" Grid.Column="5" Cursor="Hand" Click="CloseBtnClick"
+					Template="{StaticResource ButtonTemplate}" Margin="0,2,2,0" Width="36" Height="36"
+					HorizontalAlignment="Right" VerticalAlignment="Center"
+					ToolTip="Pencereyi Kapat (ESC)">
+					<fa6:ImageAwesome PrimaryColor="#ef4444" Icon="Solid_Xmark" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+				</Button>
+
+				<!-- Sol Taraf: Oyuncu Kartı (Rows 1-4, Columns 0-1) -->
+				<controls:InventoryEntryControl
+					Grid.Row="1" Grid.RowSpan="4"
+					Grid.Column="0" Grid.ColumnSpan="2"
+					Image="{Binding SkinDataObject.LargeCardImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.CardName, ElementName=Self}" />
+
+				<!-- Sol Taraf Spreyler (2x2 Grid, Rows 5-6) -->
+				<controls:InventoryEntryControl
+					Grid.Row="5" Grid.Column="0"
+					Image="{Binding SkinDataObject.Spray1Image, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.Spray1Name, ElementName=Self}" />
+				<controls:InventoryEntryControl
+					Grid.Row="5" Grid.Column="1"
+					Image="{Binding SkinDataObject.Spray2Image, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.Spray2Name, ElementName=Self}" />
+				<controls:InventoryEntryControl
+					Grid.Row="6" Grid.Column="0"
+					Image="{Binding SkinDataObject.Spray3Image, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.Spray3Name, ElementName=Self}" />
+				<controls:InventoryEntryControl
+					Grid.Row="6" Grid.Column="1"
+					Image="{Binding SkinDataObject.Spray4Image, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.Spray4Name, ElementName=Self}" />
+
+				<!-- Sütun 2: Tabancalar (Rows 1-6) -->
+				<controls:InventoryEntryControl x:Name="EntryClassic"
+					Grid.Column="2" Grid.Row="1"
+					Image="{Binding SkinDataObject.ClassicImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.ClassicName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryShorty"
+					Grid.Column="2" Grid.Row="2"
+					Image="{Binding SkinDataObject.ShortyImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.ShortyName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryFrenzy"
+					Grid.Column="2" Grid.Row="3"
+					Image="{Binding SkinDataObject.FrenzyImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.FrenzyName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryGhost"
+					Grid.Column="2" Grid.Row="4"
+					Image="{Binding SkinDataObject.GhostImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.GhostName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryBandit"
+					Grid.Column="2" Grid.Row="5"
+					Image="{Binding SkinDataObject.BanditImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.BanditName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntrySheriff"
+					Grid.Column="2" Grid.Row="6"
+					Image="{Binding SkinDataObject.SheriffImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.SheriffName, ElementName=Self}" />
+
+				<!-- Sütun 3: Hafif & Pompalı Silahlar (Rows 1-4) -->
+				<controls:InventoryEntryControl x:Name="EntryStinger"
+					Grid.Column="3" Grid.Row="1"
+					Image="{Binding SkinDataObject.StingerImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.StingerName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntrySpectre"
+					Grid.Column="3" Grid.Row="2"
+					Image="{Binding SkinDataObject.SpectreImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.SpectreName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryBucky"
+					Grid.Column="3" Grid.Row="3"
+					Image="{Binding SkinDataObject.BuckyImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.BuckyName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryJudge"
+					Grid.Column="3" Grid.Row="4"
+					Image="{Binding SkinDataObject.JudgeImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.JudgeName, ElementName=Self}" />
+
+				<!-- Bilgi / Kısayol Kartı (Row 5, Column 3) -->
+				<Border Grid.Row="5" Grid.Column="3" Margin="6" Background="#181E34" CornerRadius="18" Padding="12,6"
+				        BorderBrush="#252d47" BorderThickness="1.2">
+					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,3">
+							<fa6:ImageAwesome Icon="Solid_Lightbulb" PrimaryColor="#32e2b2" Width="13" Height="13" Margin="0,0,6,0" VerticalAlignment="Center" />
+							<TextBlock Text="Hızlı Kopyalama" FontFamily="{StaticResource Nunito}" FontSize="12.5" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
+						</StackPanel>
+						<TextBlock Text="Sol tık: Oyuncu adıyla&#x0a;Sağ tık: Sadece skinler&#x0a;Orta tık: Toplam değerle" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#8e9bb5" TextAlignment="Center" LineHeight="15" />
 					</StackPanel>
 				</Border>
-			</StackPanel>
 
-			<controls:InventoryEntryControl
-				Grid.Row="0" Grid.RowSpan="5"
-				Grid.ColumnSpan="2"
-				Image="{Binding SkinDataObject.LargeCardImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.CardName, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="1"
-				Grid.Row="5"
-				Image="{Binding SkinDataObject.Spray1Image, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.Spray1Name, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Column="1"
-				Grid.Row="6"
-				Image="{Binding SkinDataObject.Spray2Image, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.Spray2Name, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Row="5"
-				Image="{Binding SkinDataObject.Spray3Image, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.Spray3Name, ElementName=Self}" />
-			<controls:InventoryEntryControl
-				Grid.Row="6"
-				Image="{Binding SkinDataObject.Spray4Image, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.Spray4Name, ElementName=Self}" />
+				<!-- Sütun 4: Tüfekler (Rows 1-5) -->
+				<controls:InventoryEntryControl x:Name="EntryBulldog"
+					Grid.Column="4" Grid.Row="1"
+					Image="{Binding SkinDataObject.BulldogImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.BulldogName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryGuardian"
+					Grid.Column="4" Grid.Row="2"
+					Image="{Binding SkinDataObject.GuardianImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.GuardianName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryWarden"
+					Grid.Column="4" Grid.Row="3"
+					Image="{Binding SkinDataObject.WardenImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.WardenName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryPhantom"
+					Grid.Column="4" Grid.Row="4"
+					Image="{Binding SkinDataObject.PhantomImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.PhantomName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryVandal"
+					Grid.Column="4" Grid.Row="5"
+					Image="{Binding SkinDataObject.VandalImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.VandalName, ElementName=Self}" />
 
-			<controls:InventoryEntryControl x:Name="EntryClassic"
-				Grid.Column="2" Grid.Row="1"
-				Image="{Binding SkinDataObject.ClassicImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.ClassicName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryShorty"
-				Grid.Column="2" Grid.Row="2"
-				Image="{Binding SkinDataObject.ShortyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.ShortyName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryFrenzy"
-				Grid.Column="2" Grid.Row="3"
-				Image="{Binding SkinDataObject.FrenzyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.FrenzyName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryGhost"
-				Grid.Column="2" Grid.Row="4"
-				Image="{Binding SkinDataObject.GhostImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.GhostName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryBandit"
-				Grid.Column="2" Grid.Row="5"
-				Image="{Binding SkinDataObject.BanditImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.BanditName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntrySheriff"
-				Grid.Column="2" Grid.Row="6"
-				Image="{Binding SkinDataObject.SheriffImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.SheriffName, ElementName=Self}" />
+				<!-- Alt Kapat Butonu (Row 6, Column 3 & 4 Tam Genişlik) -->
+				<Button
+					Grid.Row="6" Grid.Column="3" Grid.ColumnSpan="2" Cursor="Hand" Click="CloseBtnClick"
+					Template="{StaticResource ButtonTemplate}" Margin="6,3" Height="46"
+					HorizontalAlignment="Stretch" VerticalAlignment="Center"
+					ToolTip="Pencereyi Kapat (ESC)">
+					<Border Background="#1a2035" CornerRadius="12" BorderBrush="#3c476d" BorderThickness="1.2"
+					        Padding="14,2">
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+							<fa6:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Xmark" Width="18" Height="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+							<TextBlock Text="KAPAT (ESC)" FontFamily="{StaticResource Nunito}" FontWeight="ExtraBold" FontSize="16" Foreground="#007EF9" VerticalAlignment="Center" />
+						</StackPanel>
+					</Border>
+				</Button>
 
-			<controls:InventoryEntryControl x:Name="EntryStinger"
-				Grid.Column="3" Grid.Row="1"
-				Image="{Binding SkinDataObject.StingerImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.StingerName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntrySpectre"
-				Grid.Column="3" Grid.Row="2"
-				Image="{Binding SkinDataObject.SpectreImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.SpectreName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryBucky"
-				Grid.Column="3" Grid.Row="3"
-				Image="{Binding SkinDataObject.BuckyImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.BuckyName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryJudge"
-				Grid.Column="3" Grid.Row="4"
-				Image="{Binding SkinDataObject.JudgeImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.JudgeName, ElementName=Self}" />
+				<!-- Sütun 5: Keskin Nişancı, Ağır Silahlar & Bıçak (Rows 1-6) -->
+				<controls:InventoryEntryControl x:Name="EntryMarshal"
+					Grid.Column="5" Grid.Row="1"
+					Image="{Binding SkinDataObject.MarshalImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.MarshalName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryOutlaw"
+					Grid.Column="5" Grid.Row="2"
+					Image="{Binding SkinDataObject.OutlawImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.OutlawName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryOperator"
+					Grid.Column="5" Grid.Row="3"
+					Image="{Binding SkinDataObject.OperatorImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.OperatorName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryAres"
+					Grid.Column="5" Grid.Row="4"
+					Image="{Binding SkinDataObject.AresImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.AresName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryOdin"
+					Grid.Column="5" Grid.Row="5"
+					Image="{Binding SkinDataObject.OdinImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.OdinName, ElementName=Self}" />
+				<controls:InventoryEntryControl x:Name="EntryMelee"
+					Grid.Column="5" Grid.Row="6"
+					Image="{Binding SkinDataObject.MeleeImage, ElementName=Self}"
+					TooltipName="{Binding SkinDataObject.MeleeName, ElementName=Self}" />
 
-			<!-- Bilgi / Kısayol Kartı (Row 5, Column 3) -->
-			<Border Grid.Row="5" Grid.Column="3" Margin="6" Background="#181E34" CornerRadius="18" Padding="10,6"
-			        BorderBrush="#252d47" BorderThickness="1.2">
-				<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,3">
-						<fa6:ImageAwesome Icon="Solid_Lightbulb" PrimaryColor="#32e2b2" Width="12" Height="12" Margin="0,0,5,0" VerticalAlignment="Center" />
-						<TextBlock Text="Hızlı Kopyalama" FontFamily="{StaticResource Nunito}" FontSize="12" FontWeight="Bold" Foreground="#32e2b2" VerticalAlignment="Center" />
-					</StackPanel>
-					<TextBlock Text="Sol tık: Oyuncu adıyla&#x0a;Sağ tık: Sadece skinler" FontFamily="{StaticResource Nunito}" FontSize="11" Foreground="#8e9bb5" TextAlignment="Center" LineHeight="15" />
-				</StackPanel>
-			</Border>
-
-			<controls:InventoryEntryControl x:Name="EntryBulldog"
-				Grid.Column="4" Grid.Row="1"
-				Image="{Binding SkinDataObject.BulldogImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.BulldogName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryGuardian"
-				Grid.Column="4" Grid.Row="2"
-				Image="{Binding SkinDataObject.GuardianImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.GuardianName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryWarden"
-				Grid.Column="4" Grid.Row="3"
-				Image="{Binding SkinDataObject.WardenImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.WardenName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryPhantom"
-				Grid.Column="4" Grid.Row="4"
-				Image="{Binding SkinDataObject.PhantomImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.PhantomName, ElementName=Self}" />
-			<controls:InventoryEntryControl x:Name="EntryVandal"
-				Grid.Column="4" Grid.Row="5"
-				Image="{Binding SkinDataObject.VandalImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.VandalName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryMarshal"
-				Grid.Column="5" Grid.Row="1"
-				Image="{Binding SkinDataObject.MarshalImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.MarshalName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryOutlaw"
-				Grid.Column="5" Grid.Row="2"
-				Image="{Binding SkinDataObject.OutlawImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OutlawName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryOperator"
-				Grid.Column="5" Grid.Row="3"
-				Image="{Binding SkinDataObject.OperatorImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OperatorName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryAres"
-				Grid.Column="5" Grid.Row="4"
-				Image="{Binding SkinDataObject.AresImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.AresName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryOdin"
-				Grid.Column="5" Grid.Row="5"
-				Image="{Binding SkinDataObject.OdinImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.OdinName, ElementName=Self}" />
-
-			<controls:InventoryEntryControl x:Name="EntryMelee"
-				Grid.Column="5" Grid.Row="6"
-				Image="{Binding SkinDataObject.MeleeImage, ElementName=Self}"
-				TooltipName="{Binding SkinDataObject.MeleeName, ElementName=Self}" />
-
-			<!-- Dev Kapat Butonu (Row 6, Column 3 & 4 Tam Genişlik) -->
-			<Button
-				Grid.Row="6" Grid.Column="3" Grid.ColumnSpan="2" Cursor="Hand" Click="CloseBtnClick"
-				Template="{StaticResource ButtonTemplate}" Margin="8,4" Height="62"
-				HorizontalAlignment="Stretch" VerticalAlignment="Center"
-				ToolTip="Pencereyi Kapat (ESC)">
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<fa6:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Xmark" Width="26" Height="26" Margin="0,0,14,0" VerticalAlignment="Center" />
-					<TextBlock Text="KAPAT (ESC)" FontFamily="{StaticResource Nunito}" FontWeight="ExtraBold" FontSize="20" Foreground="#007EF9" VerticalAlignment="Center" />
-				</StackPanel>
-			</Button>
-
-			<!-- Sağ Üst Köşe Kapat Butonu -->
-			<Button
-				Grid.Row="0" Grid.Column="5" Cursor="Hand" Click="CloseBtnClick"
-				Template="{StaticResource ButtonTemplate}" Margin="0,2,2,0" Width="36" Height="36"
-				HorizontalAlignment="Right" VerticalAlignment="Top"
-				ToolTip="Pencereyi Kapat (ESC)">
-				<fa6:ImageAwesome PrimaryColor="#ef4444" Icon="Solid_Xmark" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
-			</Button>
-
-		</Grid>
-	</Border>
-</Grid>
+			</Grid>
+		</Border>
+	</Grid>
 </UserControl>
-

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Resources;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -85,6 +86,13 @@ public partial class Settings : UserControl
                 };
             }
             InitWatcherState();
+            try
+            {
+                var curVer = Constants.AppVersion;
+                if (CurrentVersion != null)
+                    CurrentVersion.Text = curVer;
+            }
+            catch { }
         };
     }
 
@@ -211,22 +219,14 @@ public partial class Settings : UserControl
 
         try
         {
-            string productVersion = System.Windows.Forms.Application.ProductVersion;
+            string productVersion = Constants.AppVersion;
             CurrentVersion.Text = productVersion;
             LatestVersion.Text = L10n.Get("VersionChecking");
 
             var latest = await GetLatestVersionAsync(productVersion).ConfigureAwait(true);
             LatestVersion.Text = latest;
 
-            _ = Task.Run(() =>
-            {
-                try
-                {
-                    AutoUpdater.InstalledVersion = new Version(productVersion);
-                    AutoUpdater.Start("https://raw.githubusercontent.com/Efeumut0/ValGrid/main/ValGrid/VersionInfo.xml");
-                }
-                catch { }
-            });
+            UpdateHelper.CheckNow(reportErrors: false);
         }
         catch (Exception ex)
         {
@@ -244,12 +244,28 @@ public partial class Settings : UserControl
     {
         try
         {
-            using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(4) };
-            var content = await client.GetStringAsync("https://raw.githubusercontent.com/Efeumut0/ValGrid/main/ValGrid/VersionInfo.xml").ConfigureAwait(false);
-            var xml = new XmlDocument();
-            xml.LoadXml(content);
-            var result = xml.GetElementsByTagName("version");
-            return result.Count > 0 ? result[0].InnerText : L10n.VersionUpToDate(currentVersion);
+            using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ValGrid-Updater");
+            var json = await client.GetStringAsync(UpdateHelper.GitHubReleasesLatestApiUrl).ConfigureAwait(false);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("tag_name", out var tagElem))
+            {
+                var tag = tagElem.GetString() ?? "";
+                var vStr = tag.Trim().TrimStart('v', 'V');
+                if (Version.TryParse(vStr, out var vLatest) && Version.TryParse(currentVersion, out var vCurr))
+                {
+                    if (vLatest > vCurr)
+                    {
+                        return $"v{vStr} ({(L10n.IsEnglish ? "Update Available" : "Güncelleme Mevcut")})";
+                    }
+                    else
+                    {
+                        return L10n.VersionUpToDate(currentVersion);
+                    }
+                }
+                return string.IsNullOrEmpty(vStr) ? L10n.VersionUpToDate(currentVersion) : $"v{vStr}";
+            }
+            return L10n.VersionUpToDate(currentVersion);
         }
         catch (Exception ex)
         {

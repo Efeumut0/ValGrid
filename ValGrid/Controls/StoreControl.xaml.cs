@@ -846,6 +846,7 @@ public partial class StoreControl : UserControl
 
     private List<DailyStoreOffer> _allCatalogSkins = new();
     private bool _hasLoadedCatalog;
+    private string _catalogLoadedLang;
 
     private async void AllWeapons_Click(object sender, RoutedEventArgs e)
     {
@@ -865,12 +866,13 @@ public partial class StoreControl : UserControl
             if (StoreScroll != null) StoreScroll.Visibility = Visibility.Collapsed;
             AllWeaponsPanel.Visibility = Visibility.Visible;
 
-            if (!_hasLoadedCatalog)
+            if (!_hasLoadedCatalog || _catalogLoadedLang != L10n.ValApiLanguage)
             {
                 if (CatalogCountText != null) CatalogCountText.Text = L10n.Get("InspectLoading");
                 var skins = await StoreHelper.GetAllWeaponsCatalogAsync().ConfigureAwait(true);
                 _allCatalogSkins = skins ?? new List<DailyStoreOffer>();
                 _hasLoadedCatalog = true;
+                _catalogLoadedLang = L10n.ValApiLanguage;
             }
 
             ApplyCatalogFilter();
@@ -1146,6 +1148,11 @@ public partial class StoreControl : UserControl
             if (CatalogTierFilter.Items.Count > 5 && CatalogTierFilter.Items[5] is ComboBoxItem t5)
                 t5.Content = L10n.IsEnglish ? "Select Edition" : "Özel Seri";
         }
+
+        if (ToggleBundleItemsBtn != null) ToggleBundleItemsBtn.ToolTip = L10n.IsEnglish ? "List weapons and items in bundle" : "Paket içindeki silahları ve eşyaları listele";
+        if (BundlePrevBtn != null) BundlePrevBtn.ToolTip = L10n.IsEnglish ? "Previous Bundle" : "Önceki Paket";
+        if (BundleNextBtn != null) BundleNextBtn.ToolTip = L10n.IsEnglish ? "Next Bundle" : "Sonraki Paket";
+        if (RevealAllNightMarketBtn != null) RevealAllNightMarketBtn.ToolTip = L10n.IsEnglish ? "Reveal all hidden Night Market cards" : "Tüm kapalı Gece Pazarı kartlarını animasyonla aç";
     }
 }
 

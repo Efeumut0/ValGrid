@@ -259,11 +259,28 @@ public static class Login
 
     private static async Task GetLatestVersionAsync()
     {
-        var lines = await File.ReadAllLinesAsync(
-                Constants.LocalAppDataPath + "\\ValAPI\\version.json"
-            )
-            .ConfigureAwait(false);
-        Constants.Version = lines[0];
+        try
+        {
+            var path = Constants.LocalAppDataPath + "\\ValAPI\\version.json";
+            if (File.Exists(path))
+            {
+                var lines = await File.ReadAllLinesAsync(path).ConfigureAwait(false);
+                if (lines.Length > 0 && !string.IsNullOrWhiteSpace(lines[0]))
+                {
+                    Constants.Version = lines[0].Trim();
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Constants.Log?.Warning("Login GetLatestVersionAsync failed: {e}", ex.Message);
+        }
+
+        if (string.IsNullOrEmpty(Constants.Version))
+        {
+            Constants.Version = "release-09.00-shipping";
+        }
     }
 
     public static async Task<RestResponse> DoCachedRequestAsync(

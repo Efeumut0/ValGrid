@@ -52,25 +52,62 @@
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
+
+			<!-- Sol Bölüm: Ayarlar Butonu ve "GRUBUNUZ" Başlığı -->
+			<StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+				<Button
+					x:Name="SettingsNavBtn"
+					Cursor="Hand" Width="60" Height="60"
+					HorizontalAlignment="Left" VerticalAlignment="Center"
+					Command="{Binding DataContext.NavigateSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+					Template="{StaticResource ButtonTemplate}"
+					ToolTipService.InitialShowDelay="0">
+					<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Gear" Margin="10" />
+				</Button>
+				<TextBlock
+					x:Name="YourPartyTitleText"
+					Margin="25,0,0,0"
+					FontSize="35"
+					VerticalAlignment="Center"
+					FontWeight="SemiBold"
+					FontFamily="{StaticResource Nunito}"
+					Foreground="White"
+					Text="GRUBUNUZ" />
+			</StackPanel>
+
+			<!-- Orta Bölüm: Günlük Mağaza Butonu (Pencerenin Tam Ortasında) -->
 			<Button
-				x:Name="SettingsNavBtn"
-				Grid.Column="0" Cursor="Hand" Width="60" Height="60"
-				HorizontalAlignment="Left" VerticalAlignment="Center"
-				Command="{Binding DataContext.NavigateSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+				Grid.Column="1"
+				x:Name="DailyStoreNavBtn"
+				Cursor="Hand" Height="48" Padding="18,0"
+				HorizontalAlignment="Center" VerticalAlignment="Center"
+				Click="OpenStore_Click"
 				Template="{StaticResource ButtonTemplate}"
+				Visibility="{Binding StoreButtonVisibility, FallbackValue=Visible}"
 				ToolTipService.InitialShowDelay="0">
-
-				<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_Gear" Margin="10" />
+				<Button.Effect>
+					<DropShadowEffect BlurRadius="14" ShadowDepth="2" Color="#ffd700" Opacity="0.35" />
+				</Button.Effect>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<fa:ImageAwesome Icon="Solid_CartShopping" PrimaryColor="#ffd700" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+					<TextBlock x:Name="DailyStoreNavText" Text="Günlük Mağaza" FontFamily="{StaticResource Nunito}" FontSize="15" FontWeight="Bold"
+					           Foreground="#ffd700" VerticalAlignment="Center" />
+				</StackPanel>
 			</Button>
-			<Button
-				Grid.Column="0" x:Name="GoMatch"
-				Command="{Binding DataContext.NavigateMatchCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-				Visibility="Collapsed" />
 
-			<StackPanel Grid.Row="0" Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+			<!-- Sağ Bölüm: "DURUM" Başlığı ve Navigasyon Butonları -->
+			<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+				<TextBlock
+					x:Name="StatusTitleText"
+					Margin="0,0,30,0"
+					FontSize="35"
+					VerticalAlignment="Center"
+					FontWeight="SemiBold"
+					FontFamily="{StaticResource Nunito}"
+					Foreground="White"
+					Text="DURUM" />
+
 				<!-- Player Directory & List Button -->
 				<Button x:Name="PlayerListNavBtn" Cursor="Hand" Height="50" Margin="0,0,10,0" Padding="14,0"
 				        Click="OpenPlayerList_Click"
@@ -93,6 +130,7 @@
 						           Foreground="#007EF9" VerticalAlignment="Center" />
 					</StackPanel>
 				</Button>
+
 				<Button x:Name="InfoNavBtn" Cursor="Hand" Width="60" Height="60"
 				        Command="{Binding DataContext.NavigateInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
 				        Template="{StaticResource ButtonTemplate}"
@@ -101,49 +139,31 @@
 				</Button>
 			</StackPanel>
 
-			<!-- Top Center Daily Store Button (Günlük Mağaza) -->
 			<Button
-				x:Name="DailyStoreNavBtn"
-				Grid.Row="0" Grid.Column="2" Cursor="Hand" Height="48" Margin="10,0" Padding="18,0"
-				HorizontalAlignment="Center" VerticalAlignment="Center"
-				Click="OpenStore_Click"
-				Template="{StaticResource ButtonTemplate}"
-				Visibility="{Binding StoreButtonVisibility, FallbackValue=Visible}"
-				ToolTipService.InitialShowDelay="0">
-				<Button.Effect>
-					<DropShadowEffect BlurRadius="14" ShadowDepth="2" Color="#ffd700" Opacity="0.35" />
-				</Button.Effect>
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<fa:ImageAwesome Icon="Solid_CartShopping" PrimaryColor="#ffd700" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
-					<TextBlock x:Name="DailyStoreNavText" Text="Günlük Mağaza" FontFamily="{StaticResource Nunito}" FontSize="15" FontWeight="Bold"
-					           Foreground="#ffd700" VerticalAlignment="Center" />
-				</StackPanel>
-			</Button>
-
-			<TextBlock x:Name="YourPartyTitleText" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="35" VerticalAlignment="Center"
-			           FontWeight="SemiBold" FontFamily="{StaticResource Nunito}"
-			           Foreground="White" Text="GRUBUNUZ" />
-
-			<TextBlock x:Name="StatusTitleText" FontSize="35" VerticalAlignment="Center" HorizontalAlignment="Right"
-			           FontWeight="SemiBold" Grid.Row="0" Grid.Column="3" FontFamily="{StaticResource Nunito}"
-			           Foreground="White" Text="DURUM" />
+				Grid.Column="0" x:Name="GoMatch"
+				Command="{Binding DataContext.NavigateMatchCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+				Visibility="Collapsed" />
 		</Grid>
 
-		<ItemsControl Grid.Row="1" Grid.Column="0" Margin="0,15,0,0" VerticalAlignment="Center"
-		              ItemsSource="{Binding PlayerList}">
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<UniformGrid Columns="1" Margin="5" />
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<c:PlayerControl MaxHeight="150"
-					                 Margin="0 5"
-					                 PlayerCell="{Binding}" />
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
+		<ScrollViewer Grid.Row="1" Grid.Column="0" Margin="0,15,0,0"
+		              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+		              Focusable="False">
+			<ItemsControl VerticalAlignment="Center"
+			              ItemsSource="{Binding PlayerList}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<UniformGrid Columns="1" Margin="5" />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<c:PlayerControl MaxHeight="150"
+						                 Margin="0 5"
+						                 PlayerCell="{Binding}" />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
 
 		<!-- Empty Party State Card -->
 		<Border Grid.Row="1" Grid.Column="0" Margin="20" MaxWidth="440" MaxHeight="220"

@@ -70,23 +70,22 @@
 				x:Name="InfoHomeBtn"
 				Grid.Column="1" Cursor="Hand"
 				ToolTipService.InitialShowDelay="0"
-				Margin="25 0"
+				HorizontalAlignment="Center"
+				MinWidth="160" Height="46" Padding="20,0"
 				Command="{Binding DataContext.NavigateHomeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
 				Template="{StaticResource ButtonTemplate}">
-
-				<Viewbox
-					Grid.Column="1"
-					HorizontalAlignment="Center"
-					VerticalAlignment="Center">
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<fa:ImageAwesome PrimaryColor="#007EF9" Icon="Solid_AngleLeft" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
 					<TextBlock
 						x:Name="InfoHomeBtnText"
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
 						FontFamily="{StaticResource Nunito}"
-						FontWeight="Medium"
+						FontWeight="Bold"
+						FontSize="16"
 						Foreground="#007EF9"
 						Text="Ana Sayfa" />
-				</Viewbox>
+				</StackPanel>
 			</Button>
 
 			<fa:ImageAwesome Grid.Column="2" PrimaryColor="#007EF9" Icon="Solid_Info" Margin="10" />
@@ -131,6 +130,15 @@
 				Foreground="#32e2b2"
 				Text="Valorant Canlı Maç &amp; Mağaza Asistanı"
 				TextWrapping="Wrap" />
+
+			<!-- App Version Badge -->
+			<Border HorizontalAlignment="Center" Margin="0,14,0,0" Padding="12,4"
+			        Background="#181e33" CornerRadius="8" BorderBrush="#2e3a58" BorderThickness="1">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<TextBlock Text="v" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#8e9bb5" VerticalAlignment="Center" />
+					<TextBlock x:Name="InfoVersionText" Text="1.4.07" FontFamily="{StaticResource Nunito}" FontSize="13" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
+				</StackPanel>
+			</Border>
 		</StackPanel>
 
 		<!--

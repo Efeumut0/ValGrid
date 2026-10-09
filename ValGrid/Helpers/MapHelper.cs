@@ -312,7 +312,7 @@ public static class MapHelper
 
                 if (File.Exists(mapsPath))
                 {
-                    var json = File.ReadAllText(mapsPath);
+                    var json = File.ReadAllText(mapsPath).Trim().Trim('\uFEFF', '\u200B');
                     var dict = JsonSerializer.Deserialize<Dictionary<string, ValMap>>(
                         json,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }

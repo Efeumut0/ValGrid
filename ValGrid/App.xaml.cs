@@ -179,7 +179,7 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.18";
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.4.08";
 
         var valGridAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\ValGrid";
         var legacyAppDataNowt = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\NOWT";
@@ -220,10 +220,8 @@ public partial class App : Application
                 .BuildServiceProvider()
         );
 
-        // AutoUpdater disabled for custom build
-        // AutoUpdater.ShowSkipButton = false;
-        // AutoUpdater.InstalledVersion = new Version(System.Windows.Forms.Application.ProductVersion);
-        // AutoUpdater.Start(update_url);
+        // Periodic auto update system (checks on launch + every 30 minutes in background)
+        UpdateHelper.InitializeAutoUpdater();
 
         MainWindow = new MainWindow();
         MainWindow.Show();

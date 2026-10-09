@@ -85,14 +85,46 @@ public static class CurrencyHelper
         return $"{vp.ToString("N0", TrCulture)} VP";
     }
 
+    public static string FormatPrice(int vp)
+    {
+        if (vp <= 0) return L10n.IsEnglish ? "$0.00" : "0 TL";
+        if (L10n.IsEnglish)
+        {
+            var usd = Math.Round(vp / 100.0, 2);
+            return $"${usd.ToString("F2", CultureInfo.InvariantCulture)}";
+        }
+        return FormatTl(vp);
+    }
+
+    public static string FormatApproximatePrice(int vp)
+    {
+        if (vp <= 0) return L10n.IsEnglish ? "$0.00" : "0 TL";
+        if (L10n.IsEnglish)
+        {
+            var usd = Math.Round(vp / 100.0, 2);
+            return $"~${usd.ToString("F2", CultureInfo.InvariantCulture)}";
+        }
+        return $"~{FormatTl(vp)}";
+    }
+
     public static string FormatTl(int vp)
     {
+        if (L10n.IsEnglish)
+        {
+            var usd = Math.Round(vp / 100.0, 2);
+            return $"${usd.ToString("F2", CultureInfo.InvariantCulture)}";
+        }
         var tl = VpToTl(vp);
         return $"{tl.ToString("N0", TrCulture)} TL";
     }
 
     public static string FormatTlCompact(int vp)
     {
+        if (L10n.IsEnglish)
+        {
+            var usd = Math.Round(vp / 100.0, 2);
+            return $"${usd.ToString("F2", CultureInfo.InvariantCulture)}";
+        }
         var tl = VpToTl(vp);
         if (tl >= 1000)
         {
@@ -104,7 +136,11 @@ public static class CurrencyHelper
 
     public static string FormatVpAndTl(int vp)
     {
-        if (vp <= 0) return "0 VP (0 TL)";
+        if (vp <= 0) return L10n.IsEnglish ? "0 VP ($0.00)" : "0 VP (0 TL)";
+        if (L10n.IsEnglish)
+        {
+            return $"{FormatVp(vp)} ({FormatApproximatePrice(vp)})";
+        }
         return $"{FormatVp(vp)} (~{FormatTl(vp)})";
     }
 }

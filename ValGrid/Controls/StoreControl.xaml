@@ -63,7 +63,7 @@
         <Border Background="#D0080B14" MouseDown="Backdrop_MouseDown" />
 
         <!-- Main Modal Window -->
-        <Border Margin="50,30,50,30" MaxWidth="1340" MaxHeight="810"
+        <Border Margin="24,14" MaxWidth="1340" MaxHeight="810"
                 Background="#131828" CornerRadius="18"
                 BorderBrush="#293554" BorderThickness="1.5"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -391,7 +391,7 @@
                                                 <!-- Carousel Navigation Arrows & Indicators -->
                                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                                     <!-- Prev Button -->
-                                                    <Button Click="PrevBundle_Click" Margin="0,0,6,0" Padding="8,6"
+                                                    <Button x:Name="BundlePrevBtn" Click="PrevBundle_Click" Margin="0,0,6,0" Padding="8,6"
                                                             Background="#172036" BorderBrush="#2e3d61" BorderThickness="1"
                                                             Cursor="Hand" Style="{StaticResource ModernStoreButton}" ToolTip="Önceki Paket">
                                                         <fa:ImageAwesome Icon="Solid_ChevronLeft" PrimaryColor="#cbd5e1" Width="10" Height="10" />
@@ -404,7 +404,7 @@
                                                     </Border>
 
                                                     <!-- Next Button -->
-                                                    <Button Click="NextBundle_Click" Padding="8,6"
+                                                    <Button x:Name="BundleNextBtn" Click="NextBundle_Click" Padding="8,6"
                                                             Background="#172036" BorderBrush="#2e3d61" BorderThickness="1"
                                                             Cursor="Hand" Style="{StaticResource ModernStoreButton}" ToolTip="Sonraki Paket">
                                                         <fa:ImageAwesome Icon="Solid_ChevronRight" PrimaryColor="#cbd5e1" Width="10" Height="10" />
@@ -442,7 +442,7 @@
                                                                 BorderThickness="1.2"
                                                                 Cursor="Hand"
                                                                 PreviewMouseLeftButtonUp="SkinCard_Click"
-                                                                ToolTip="Tıklayarak incele ve videosunu izle">
+                                                                ToolTip="{Binding BundleItemTooltip}">
                                                             <Grid>
                                                                 <Grid.RowDefinitions>
                                                                     <RowDefinition Height="Auto" />
@@ -466,8 +466,8 @@
                                                                 <Image Grid.Row="1" Source="{Binding Image}" Stretch="Uniform" Margin="2"
                                                                        RenderOptions.BitmapScalingMode="HighQuality" />
                                                                 <TextBlock Grid.Row="2" Text="{Binding Name}" FontFamily="{StaticResource Nunito}"
-                                                                           FontSize="12" FontWeight="Bold" Foreground="White"
-                                                                           TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                                                            FontSize="12" FontWeight="Bold" Foreground="White"
+                                                                            TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
                                                                 <Grid Grid.Row="3" Margin="0,5,0,0">
                                                                     <Grid.ColumnDefinitions>
                                                                         <ColumnDefinition Width="*" />
@@ -478,7 +478,7 @@
                                                                         <TextBlock Text="{Binding VpCostFormatted}" FontFamily="{StaticResource Nunito}"
                                                                                    FontSize="11.5" FontWeight="Bold" Foreground="#ffd700" VerticalAlignment="Center" />
                                                                     </StackPanel>
-                                                                    <TextBlock Grid.Column="1" Text="{Binding BundleDiscountedCostFormatted, StringFormat='{}Paket: {0}'}"
+                                                                    <TextBlock Grid.Column="1" Text="{Binding BundleDiscountedLabel}"
                                                                                FontFamily="{StaticResource Nunito}" FontSize="10" FontWeight="SemiBold"
                                                                                Foreground="#38bdf8" VerticalAlignment="Center" Visibility="{Binding BundleDiscountVisibility}" />
                                                                 </Grid>
@@ -516,7 +516,7 @@
                                                 BorderThickness="1.5"
                                                 Cursor="Hand"
                                                 PreviewMouseLeftButtonUp="SkinCard_Click"
-                                                ToolTip="Tıklayarak incele, seviyeleri ve videoları görüntüle">
+                                                ToolTip="{Binding WeaponCardTooltip}">
                                             <Border.Effect>
                                                 <DropShadowEffect BlurRadius="12" ShadowDepth="3" Color="Black" Opacity="0.45" />
                                             </Border.Effect>
@@ -593,7 +593,7 @@
                                                         Padding="6,3" HorizontalAlignment="Center">
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                         <fa:ImageAwesome Icon="Solid_Film" PrimaryColor="#38bdf8" Width="11" Height="11" Margin="0,0,5,0" VerticalAlignment="Center" />
-                                                        <TextBlock Text="İncele &amp; Video" FontFamily="{StaticResource Nunito}"
+                                                        <TextBlock Text="{Binding InspectActionLabel}" FontFamily="{StaticResource Nunito}"
                                                                    FontSize="11" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
                                                     </StackPanel>
                                                 </Border>
@@ -653,7 +653,7 @@
                                                         Cursor="Hand"
                                                         RenderTransformOrigin="0.5,0.5"
                                                         PreviewMouseLeftButtonUp="NightMarketCard_Click"
-                                                        ToolTip="Tıklayarak kartı çevir veya incele">
+                                                        ToolTip="{Binding NightMarketTooltip}">
                                                     <Border.RenderTransform>
                                                         <ScaleTransform x:Name="CardScale" ScaleX="1.0" ScaleY="1.0" />
                                                     </Border.RenderTransform>
@@ -871,10 +871,10 @@
                                         <Border Margin="6" Padding="12,12" CornerRadius="12"
                                                 Background="{Binding TierBackgroundBrush}"
                                                 BorderBrush="{Binding TierBorderBrush}"
-                                                BorderThickness="1.5"
+                                                 BorderThickness="1.5"
                                                 Cursor="Hand"
                                                 PreviewMouseLeftButtonUp="SkinCard_Click"
-                                                ToolTip="Tıklayarak incele, seviye videolarını ve renk varyantlarını izle">
+                                                ToolTip="{Binding CatalogCardTooltip}">
                                             <Border.Effect>
                                                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Color="Black" Opacity="0.4" />
                                             </Border.Effect>
@@ -935,7 +935,7 @@
                                                         Padding="6,3" HorizontalAlignment="Center">
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                         <fa:ImageAwesome Icon="Solid_Film" PrimaryColor="#38bdf8" Width="10" Height="10" Margin="0,0,4,0" VerticalAlignment="Center" />
-                                                        <TextBlock Text="İncele &amp; Video" FontFamily="{StaticResource Nunito}"
+                                                        <TextBlock Text="{Binding InspectActionLabel}" FontFamily="{StaticResource Nunito}"
                                                                    FontSize="10.5" FontWeight="Bold" Foreground="#38bdf8" VerticalAlignment="Center" />
                                                     </StackPanel>
                                                 </Border>

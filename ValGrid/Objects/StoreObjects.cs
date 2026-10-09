@@ -15,12 +15,18 @@ public class DailyStoreOffer : Microsoft.Toolkit.Mvvm.ComponentModel.ObservableO
     public string WeaponType { get; set; } = "Silah";
     public int VpCost { get; set; }
     public string VpCostFormatted => $"{VpCost:N0} VP";
-    public string TlCostFormatted => $"~{CurrencyHelper.FormatTl(VpCost)}";
+    public string TlCostFormatted => CurrencyHelper.FormatApproximatePrice(VpCost);
     public string TierDevName { get; set; } = "Standard";
     public string TierDisplayName { get; set; } = "";
     public string TierColor { get; set; } = "#7f8c8d";
     public string TierIconUrl { get; set; } = "";
     public string VpIconUrl => StoreHelper.VpIconUrl;
+
+    public string InspectActionLabel => L10n.IsEnglish ? "Inspect & Video" : "İncele & Video";
+    public string WeaponCardTooltip => L10n.IsEnglish ? "Click to inspect, view levels & videos" : "Tıklayarak incele, seviyeleri ve videoları görüntüle";
+    public string BundleItemTooltip => L10n.IsEnglish ? "Click to inspect and watch video" : "Tıklayarak incele ve videosunu izle";
+    public string NightMarketTooltip => L10n.IsEnglish ? "Click to flip card or inspect" : "Tıklayarak kartı çevir veya incele";
+    public string CatalogCardTooltip => L10n.IsEnglish ? "Click to inspect, watch level videos & variants" : "Tıklayarak incele, seviye videolarını ve renk varyantlarını izle";
 
     public Uri CardLargeArt { get; set; }
     public Uri CardWideArt { get; set; }
@@ -79,7 +85,10 @@ public class DailyStoreOffer : Microsoft.Toolkit.Mvvm.ComponentModel.ObservableO
     // Bundle / Special Set Discount properties
     public int BundleDiscountedCost { get; set; }
     public string BundleDiscountedCostFormatted => BundleDiscountedCost > 0 ? $"{BundleDiscountedCost:N0} VP" : "";
-    public string BundleDiscountedTlCostFormatted => BundleDiscountedCost > 0 ? $"~{CurrencyHelper.FormatTl(BundleDiscountedCost)}" : "";
+    public string BundleDiscountedTlCostFormatted => BundleDiscountedCost > 0 ? CurrencyHelper.FormatApproximatePrice(BundleDiscountedCost) : "";
+    public string BundleDiscountedLabel => BundleDiscountedCost > 0
+        ? (L10n.IsEnglish ? $"Bundle: {BundleDiscountedCostFormatted}" : $"Paket: {BundleDiscountedCostFormatted}")
+        : "";
     public bool HasBundleDiscount => BundleDiscountedCost > 0 && BundleDiscountedCost < VpCost;
     public Visibility BundleDiscountVisibility => HasBundleDiscount ? Visibility.Visible : Visibility.Collapsed;
 
@@ -113,7 +122,7 @@ public class FeaturedBundleOffer : Microsoft.Toolkit.Mvvm.ComponentModel.Observa
     public string ExtraDescription { get; set; } = "";
     public int VpCost { get; set; }
     public string VpCostFormatted => $"{VpCost:N0} VP";
-    public string TlCostFormatted => $"~{CurrencyHelper.FormatTl(VpCost)}";
+    public string TlCostFormatted => CurrencyHelper.FormatApproximatePrice(VpCost);
     public int BaseVpCost { get; set; }
     public string BaseVpCostFormatted => BaseVpCost > 0 ? $"{BaseVpCost:N0} VP" : "";
     public int DiscountPercent { get; set; }

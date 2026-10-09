@@ -70,8 +70,21 @@ public static class ChatTemplateManager
                 var filePath = GetConfigFilePath();
                 if (File.Exists(filePath))
                 {
-                    var json = File.ReadAllText(filePath);
-                    _data = JsonSerializer.Deserialize<ChatTemplatesData>(json) ?? new ChatTemplatesData();
+                    var json = File.ReadAllText(filePath).Trim().Trim('\uFEFF', '\u200B');
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true,
+                            AllowTrailingCommas = true,
+                            ReadCommentHandling = JsonCommentHandling.Skip
+                        };
+                        _data = JsonSerializer.Deserialize<ChatTemplatesData>(json, options) ?? new ChatTemplatesData();
+                    }
+                    else
+                    {
+                        _data = new ChatTemplatesData();
+                    }
                 }
                 else
                 {
@@ -81,6 +94,15 @@ public static class ChatTemplateManager
             catch (Exception ex)
             {
                 Constants.Log?.Error(ex, "Failed to load chat_templates.json, using defaults.");
+                try
+                {
+                    var filePath = GetConfigFilePath();
+                    if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
+                    {
+                        File.Copy(filePath, filePath + ".corrupt.bak", true);
+                    }
+                }
+                catch { }
                 _data = new ChatTemplatesData();
             }
             finally
@@ -140,7 +162,7 @@ public static class ChatTemplateManager
             {
                 var filePath = GetConfigFilePath();
                 var json = JsonSerializer.Serialize(_data, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(filePath, json);
+                File.WriteAllText(filePath, json, new System.Text.UTF8Encoding(false));
             }
             catch (Exception ex)
             {
@@ -171,7 +193,7 @@ public static class ChatTemplateManager
             {
                 var filePath = GetConfigFilePath();
                 var json = JsonSerializer.Serialize(_data, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(filePath, json);
+                File.WriteAllText(filePath, json, new System.Text.UTF8Encoding(false));
             }
             catch (Exception ex)
             {
