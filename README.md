@@ -5,7 +5,7 @@
 <h1 align="center">ValGrid</h1>
 
 <p align="center">
-  <strong>Valorant Live Match Intelligence, Skin Inventory Value & Daily Store Companion for Windows</strong>
+  <strong>Valorant match info, skin prices and daily store on Windows</strong>
 </p>
 
 <p align="center">
@@ -31,9 +31,9 @@
 
 ## 📖 Overview
 
-**ValGrid** is a fast, clean, and modern open-source Windows desktop assistant for Valorant players. By interfacing locally with the official Riot Client local API and Valorant public services, it provides real-time lobby rank inspection, teammate/opponent inventory value calculation, store rotation and Night Market browsing with HD skin preview videos, custom player notes, and customizable one-click chat announcements.
+**ValGrid** is an open-source Windows app for Valorant. It reads data from the local Riot Client and public Valorant services to show player ranks and estimate the value of equipped skins. You can also browse the daily store and Night Market, watch skin previews, save player notes and copy chat messages from templates.
 
-Everything is packed into a single, lightweight Windows installer that includes both the main application and an optional silent background watcher.
+The installer includes the app and an optional watcher that opens it when Valorant starts.
 
 ---
 
@@ -48,9 +48,9 @@ Everything is packed into a single, lightweight Windows installer that includes 
   - Calculates total lobby inventory worth in both Valorant Points (VP) and estimated real currency (TL / USD).
 
 - **👥 Encounter Tracker & Player Directory**
-  - Keeps local memory of past encounters, showing how many times you played with or against each player.
+  - Shows how often you played with or against each player.
   - Tag players (♀ Female / ♂ Male), save private player notes, or blacklist toxic players.
-  - Filter and sort through your encounter history easily.
+  - Filter and sort your encounter history.
 
 - **🛍️ Daily Store & Night Market Viewer**
   - View your 24h daily store offers, featured skin bundles, and Night Market cards.
@@ -58,23 +58,23 @@ Everything is packed into a single, lightweight Windows installer that includes 
 
 - **💬 Dynamic Chat Message Templates**
   - One-click copy match start, match end, and inventory leaderboard messages to clipboard.
-  - Fully customizable via Settings with live interactive preview and dynamic tags:
+  - Edit and preview messages in Settings using these tags:
     `{totalVp}`, `{totalTl}`, `{richest}`, `{richest1}`, `{richest2}`, `{blacklist}`, `{leaderboard}`.
 
 - **⚡ Silent Background Watcher (ValGridWatcher)**
-  - Extremely lightweight background process that detects Valorant launching and opens ValGrid automatically.
-  - Can be enabled or disabled anytime directly from the Settings menu.
+  - Opens ValGrid automatically when you start Valorant.
+  - Turn it on or off in Settings.
 
 - **🌐 Full Bilingual Support**
-  - Seamless English and Turkish interface localization.
+  - The interface is available in English and Turkish.
 
 ---
 
 ## 📥 Download & Installation
 
-1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) (`ValGrid_Setup_v1.4.08.exe`).
+1. Download the latest installer from [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest).
 2. Run the setup wizard (installing the silent background watcher is optional during setup).
-3. Start Valorant and launch ValGrid — lobby data will populate automatically.
+3. Start Valorant, then open ValGrid to see lobby data.
 
 > **System Requirements:** Windows 10 (version 1903+) or Windows 11 (64-bit). The installer automatically configures the required .NET 6 Desktop Runtime if needed.
 
@@ -131,9 +131,9 @@ This project is licensed under the [MIT License](LICENSE).
 
 # 🇹🇷 ValGrid (Türkçe Dokümantasyon)
 
-**ValGrid**, Valorant oyuncuları için geliştirilmiş; canlı maç istihbaratı, lobi envanter değeri hesaplayıcı, video önizlemeli günlük mağaza vitrini, oyuncu hafızası ve özelleştirilebilir sohbet şablonlarını tek çatı altında toplayan modern bir Windows masaüstü asistanıdır.
+**ValGrid**, Valorant için bir Windows uygulaması. Maçtaki oyuncuların ranklarını ve takılı skinlerin tahmini değerini gösterir. Günlük mağazaya ve Gece Pazarı’na bakabilir, skin videolarını izleyebilir, oyunculara not ekleyebilir ve sohbet mesajı şablonları hazırlayabilirsiniz.
 
-Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.exe`) halinde sunulur.
+Kurulum sırasında Valorant açıldığında ValGrid’i başlatan arka plan izleyicisini de ekleyebilirsiniz.
 
 ---
 
@@ -156,7 +156,7 @@ Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.
 
 5. **Özelleştirilebilir Chat Şablonları:**
    - Maç başı, maç sonu ve liderlik mesajlarını tek tıkla panoya kopyalar.
-   - Ayarlar menüsünden `{totalVp}`, `{totalTl}`, `{richest}`, `{blacklist}`, `{leaderboard}` gibi dinamik etiketlerle mesajlarınızı canlı önizlemeli olarak dilediğiniz gibi düzenleyebilirsiniz.
+   - Ayarlar menüsünden `{totalVp}`, `{totalTl}`, `{richest}`, `{blacklist}`, `{leaderboard}` gibi dinamik etiketlerle mesajlarınızı düzenleyip önizleyebilirsiniz.
 
 6. **Sessiz Arka Plan Algılayıcısı (ValGridWatcher):**
    - Bilgisayarınızda Valorant başlatıldığında ValGrid'i otomatik olarak açan hafif arka plan servisi. Ayarlardan istendiğinde açılıp kapatılabilir. Kurulum sihirbazında seçilebilir.
@@ -165,7 +165,7 @@ Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.
 
 ### 💾 Kurulum & Otomatik Güncelleme
 
-1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) sayfasından en güncel `ValGrid_Setup_v1.4.08.exe` kurulum dosyasını indirin.
+1. [**Releases**](https://github.com/Efeumut0/ValGrid/releases/latest) sayfasından en güncel kurulum dosyasını indirin.
 2. Kurulum sihirbazını tamamlayın (arka plan izleyicisini kurmak isteğe bağlıdır).
 3. Valorant çalışırken ValGrid'i açın; lobi verileri otomatik olarak ekrana gelecektir.
 4. **Otomatik Güncelleme:** GitHub üzerinde yeni bir release yayınlandığında, ValGrid açılışta veya Ayarlar menüsünden güncellemeyi otomatik olarak algılar ve yeni kurulum paketini indirmenizi sağlar.
@@ -182,7 +182,7 @@ Ana uygulama ve arka plan algılayıcı servisi tek bir hafif kurulum paketi (`.
 
 ### 🌟 Orijinal Proje & Teşekkürler (Credits & Attribution)
 
-Bu proje, Soneliem tarafından geliştirilen açık kaynaklı **[NOWT](https://github.com/Soneliem/NOWT)** projesinin temelleri üzerine inşa edilmiş, yeniden adlandırılmış, modernize edilmiş ve yeni özelliklerle (chat şablon sistemi, çift dilli arayüz, arka plan izleyicisi, envanter hesaplayıcı) geliştirilmiştir. Katkılarından ötürü orijinal geliştiricilere teşekkür ederiz.
+ValGrid, Soneliem’in açık kaynaklı **[NOWT](https://github.com/Soneliem/NOWT)** projesini temel alır. Bu sürümde sohbet şablonları, Türkçe ve İngilizce arayüz, arka plan izleyicisi ve envanter değeri hesabı eklendi. Orijinal geliştiricilere teşekkür ederiz.
 
 * **Orijinal Proje:** [https://github.com/Soneliem/NOWT](https://github.com/Soneliem/NOWT)
 * **Lisans:** [MIT License](LICENSE)
